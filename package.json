@@ -1,0 +1,54 @@
+{
+  "name": "rds-libjs",
+  "version": "0.1.0",
+  "description": "Migration framework for versioning of JS IPFS Repo",
+  "keywords": [
+    "IPFS",
+    "Swarm",
+    "RSK"
+  ],
+  "homepage": "https://github.com/rsksmart/rds-libjs",
+  "bugs": {
+    "url": "https://github.com/rsksmart/rds-libjs/issues/"
+  },
+  "license": "???",
+  "files": [
+    "types",
+    "lib",
+    "dist"
+  ],
+  "main": "src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rsksmart/rds-libjs.git"
+  },
+  "scripts": {
+    "compile": "tasegir compile",
+    "compile:watch": "tasegir compile -- --watch",
+    "types-check": "tasegir types-check",
+    "exec": "tasegir run",
+    "lint": "tasegir lint",
+    "release": "tasegir release",
+    "build": "tasegir build",
+    "test": "tasegir test",
+    "test:node": "tasegir test --target node",
+    "test:browser": "tasegir test --target browser"
+  },
+  "dependencies": {
+    "debug": "^4.1.0"
+  },
+  "devDependencies": {
+    "aegir": "^20.4.1",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "dirty-chai": "^2.0.1",
+    "sinon": "^7.5.0"
+  },
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
+  "contributors": [
+    "Adam Uhlíř <adam@uhlir.dev>"
+  ]
+}
