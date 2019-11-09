@@ -1,7 +1,7 @@
 {
   "name": "rds-libjs",
   "version": "0.1.0",
-  "description": "Migration framework for versioning of JS IPFS Repo",
+  "description": "Library integrating distributed storage projects",
   "keywords": [
     "IPFS",
     "Swarm",
@@ -35,14 +35,22 @@
     "test:browser": "tasegir test --target browser"
   },
   "dependencies": {
-    "debug": "^4.1.0"
+    "@types/node": "^12.12.6",
+    "@types/pull-stream": "^3.6.0",
+    "cids": "^0.7.1",
+    "debug": "^4.1.0",
+    "find-up": "^4.1.0",
+    "ipfs-http-client": "^39.0.2",
+    "ipfsd-ctl": "^0.47.4",
+    "js-ipfs": "0.0.301",
+    "merge-options": "^2.0.0"
   },
   "devDependencies": {
-    "aegir": "^20.4.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dirty-chai": "^2.0.1",
-    "sinon": "^7.5.0"
+    "sinon": "^7.5.0",
+    "tasegir": "^1.1.1"
   },
   "engines": {
     "node": ">=10.0.0",
