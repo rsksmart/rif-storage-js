@@ -1,9 +1,16 @@
 import { Address, Provider, IpfsStorageProvider } from '../definitions'
-import ipfs, { ClientOptions, CidAddress } from 'ipfs-http-client'
+import ipfs, { ClientOptions, CidAddress, IpfsClient } from 'ipfs-http-client'
 
-export default function IpfsFactory (options: ClientOptions): IpfsStorageProvider {
+function isIpfs (client: IpfsClient | ClientOptions): client is IpfsClient {
+  client = client as IpfsClient
+  return typeof client.get === 'function' && typeof client.add === 'function'
+}
+
+export default function IpfsFactory (options: ClientOptions | IpfsClient): IpfsStorageProvider {
+  const ipfsClient = isIpfs(options) ? options : ipfs(options)
+
   return {
-    ipfs: ipfs(options),
+    ipfs: ipfsClient,
     type: Provider.IPFS,
 
     async get (address: CidAddress): Promise<Buffer> {

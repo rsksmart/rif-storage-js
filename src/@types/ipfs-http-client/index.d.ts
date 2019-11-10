@@ -27,7 +27,7 @@ declare module 'ipfs-http-client' {
       recursive?: boolean
     }
 
-    interface AddOptions extends Options{
+    interface AddOptions extends Options {
       chunker?: string
       cidVersion?: 0 | 1
       cidBase?: string // TODO: Add base values
@@ -60,7 +60,7 @@ declare module 'ipfs-http-client' {
       content?: Buffer
     }
 
-    interface LsResult extends IpfsResult{
+    interface LsResult extends IpfsResult {
       name: string
       type: string
       depth: number
@@ -87,8 +87,17 @@ declare module 'ipfs-http-client' {
 
   }
 
+  export interface Identity {
+    id: string
+    publicKey: string
+    addresses: Array<string>
+    agentVersion: string
+    protocolVersion: string
+  }
+
   export interface IpfsClient extends RegularFiles.RegularFilesCommands {
     send (options: object, cb: () => void): void
+    id (): Identity
   }
 
   interface Port {
