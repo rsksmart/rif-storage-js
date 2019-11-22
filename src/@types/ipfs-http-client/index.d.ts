@@ -14,20 +14,35 @@ declare module 'ipfs-http-client' {
     signal?: any
   }
 
+  export interface IpfsResult {
+    path: string
+    size: number
+    hash: string
+  }
+
+  export interface IpfsObject {
+    path: string
+    content?: Buffer | AsyncIterator<Buffer> | ReadableStream
+  }
+
+  export interface BufferIpfsObject extends IpfsObject {
+    content?: Buffer
+  }
+
   namespace RegularFiles {
 
-    interface GetOptions extends Options {
+    export interface GetOptions extends Options {
       offset?: string
       length?: string
       compress?: string
       compressionLevel?: string
     }
 
-    interface LsOptions extends Options {
+    export interface LsOptions extends Options {
       recursive?: boolean
     }
 
-    interface AddOptions extends Options {
+    export interface AddOptions extends Options {
       chunker?: string
       cidVersion?: 0 | 1
       cidBase?: string // TODO: Add base values
@@ -45,22 +60,7 @@ declare module 'ipfs-http-client' {
       wrapWithDirectory?: boolean
     }
 
-    interface IpfsResult {
-      path: string
-      size: number
-      hash: string
-    }
-
-    interface IpfsObject {
-      path: string
-      content?: Buffer | AsyncIterator<Buffer> | ReadableStream
-    }
-
-    interface BufferIpfsObject extends IpfsObject {
-      content?: Buffer
-    }
-
-    interface LsResult extends IpfsResult {
+    export interface LsResult extends IpfsResult {
       name: string
       type: string
       depth: number

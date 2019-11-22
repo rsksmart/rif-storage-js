@@ -1,6 +1,5 @@
-
 import ipfs from './providers/ipfs'
-import { Storage, Provider, Options } from './definitions'
+import { Storage, Provider, Options } from './types'
 
 function factory (provider: Provider, options: Options): Storage {
   switch (provider) {
@@ -14,4 +13,6 @@ function factory (provider: Provider, options: Options): Storage {
 }
 
 export default factory
+export { Provider }
 export { ipfs }
+export { isFile, isDirectory } from './utils'

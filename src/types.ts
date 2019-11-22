@@ -11,10 +11,11 @@ export interface Storage {
 
   /**
    * Retrieves data from provider's network
-   * @param address
+   * @param addresses
    * @return Buffer with data
    */
-  get (address: Address): Promise<Buffer>
+  get (addresses: Address): Promise<Directory | Buffer>
+  get (...addresses: Array<Address>): Promise<Directory | Buffer | Array<Directory | Buffer>>
 
   /**
    * Stores data on provider's network
@@ -22,11 +23,33 @@ export interface Storage {
    * @return Address of the stored data
    */
   put (data: Buffer): Promise<Address>
+  put (data: Directory): Promise<[Address, DirectoryResult]>
 }
 
 export type Address = string
 
 export type Options = ClientOptions
+
+export interface DirectoryEntry {
+  data: Buffer
+  contentType?: string
+  size?: number
+}
+
+export type Directory = Record<string, DirectoryEntry>
+
+export enum EntryType {
+  FILE = 'file',
+  DIRECTORY = 'directory'
+}
+
+export interface DirectoryResultEntry {
+  hash: string
+  size: number
+  type: EntryType
+}
+
+export type DirectoryResult = Record<string, DirectoryResultEntry>
 
 /*******************************************************
  ****************** IPFS INTEGRATION *******************
@@ -35,5 +58,8 @@ export type Options = ClientOptions
 export interface IpfsStorageProvider extends Storage {
   ipfs: IpfsClient
   put (data: Buffer): Promise<Address>
-  get (address: CidAddress): Promise<Buffer>
+  put (data: Directory): Promise<[Address, DirectoryResult]>
+
+  get (addresses: Address): Promise<Directory | Buffer>
+  get (...addresses: Array<CidAddress>): Promise<Array<Directory | Buffer>>
 }
