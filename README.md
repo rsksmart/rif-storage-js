@@ -11,7 +11,7 @@
 ![](https://img.shields.io/badge/npm-%3E%3D6.0.0-orange.svg?style=flat-square)
 ![](https://img.shields.io/badge/Node.js-%3E%3D10.0.0-orange.svg?style=flat-square)
 
-> Library integrating distributed storage projects  
+> Client library integrating distributed storage projects  
 
 ## Table of Contents
 
@@ -36,9 +36,71 @@
 
 ### Use in Node.js
 
+```js
+var RifStorage = require('rds-libjs')
+```
+
+### Use in a browser with browserify, webpack or any other bundler
+
+```js
+var RifStorage = require('rds-libjs')
+```
+
+### Use in a browser Using a script tag
+
+Loading this module through a script tag will make the `Storage` obj available in the global namespace.
+
+```html
+<script src="https://unpkg.com/rds-libjs/dist/index.min.js"></script>
+<!-- OR -->
+<script src="https://unpkg.com/rds-libjs/dist/index.js"></script>
+```
+
 ## Usage
 
+This is a client library, therefore you need to provide access to the provider's running node for specifics see [Providers](#providers).
+
+```javascript
+import RifStorage, { Provider } from 'rds-libj'
+
+// Connects to locally running node
+const storage = RifStorage(Provider.IPFS, { host: 'localhost', port: '5001', protocol: 'http' })
+
+const fileHash = storage.put(Buffer.from('hello world!'))
+const retrievedData = storage.get(fileHash) // Returns Buffer
+console.log(retrievedData.toString()) // prints 'hello world!'
+
+const directory = {
+  'file': { data: Buffer.from('nice essay')},
+  'other-file': { data: Buffer.from('nice essay')},
+  'folder/with-file': { data: Buffer.from('nice essay')},
+  'folder/with-other-folder/and-file': { data: Buffer.from('nice essay')}
+}
+const [rootHash, dirResult] = storage.put(directory)
+const retrievedDirectory = storage.get(rootHash)
+```
+
+## Providers
+
+This library integrates several (decentralized) storage providers, currently supported is:
+ 
+ - [IPFS](https://ipfs.io/) using [js-ipfs-http-client]
+
+### IPFS
+
+ > in-browsers node ✅
+
+```javascript
+RifStorage(Provider.IPFS, ipfsOptions)
+```
+
+`ipfsOptions` are directly passed to [js-ipfs-http-client], hence check that for syntax and options.
+
+You can run a node directly in browser using [js-ipfs]. Just create instance and pass it instance instead of `ipfsOption`.
+
 ## API
+
+TBD
 
 ## Contribute
 
@@ -52,3 +114,6 @@ There are some ways you can make this module better:
 ## License
 
 TBD
+
+[js-ipfs-http-client]: https://github.com/ipfs/js-ipfs-http-client/
+[js-ipfs]: https://github.com/ipfs/js-ipfs
