@@ -113,7 +113,7 @@ There are some ways you can make this module better:
 
 ## License
 
-TBD
+[MIT](./LICENSE)
 
 [js-ipfs-http-client]: https://github.com/ipfs/js-ipfs-http-client/
 [js-ipfs]: https://github.com/ipfs/js-ipfs
