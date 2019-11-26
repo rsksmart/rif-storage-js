@@ -1,7 +1,7 @@
 import { ipfs as ipfsProvider } from '../../../src'
 import * as utils from '../../../src/utils'
 import { IpfsClient } from 'ipfs-http-client'
-import { IpfsStorageProvider } from '../../../src/types'
+import { EntryType, IpfsStorageProvider } from '../../../src/types'
 import createIpfs from './utils'
 
 import chai from 'chai'
@@ -32,17 +32,6 @@ describe('IPFS provider', () => {
   })
 
   describe('.put()', () => {
-    it('should validate data', () => {
-      const inputs = [
-        1, 'string', null, undefined, [], {}, { 'some-path': '' }, { '': '' }, { 'some-path': {} },
-        { 'some-path': { data: '' } }, { 'some-path': { data: {} } }, { 'some-path': { data: null } }
-      ]
-
-      // @ts-ignore
-      const promises = inputs.map(entry => expect(provider.put(entry), `failing with ${JSON.stringify(entry)}`).to.be.eventually.rejectedWith(ValueError))
-      return Promise.all(promises)
-    })
-
     it('should store file', async () => {
       const cid = await provider.put(Buffer.from('hello world'))
 
@@ -52,10 +41,6 @@ describe('IPFS provider', () => {
       const fetchedFromIpfs = result[0]
       expect(fetchedFromIpfs.path).to.equal(cid)
       expect(fetchedFromIpfs.content && fetchedFromIpfs.content.toString()).to.equal('hello world')
-    })
-
-    it('should reject empty directory', () => {
-      return expect(provider.put({})).to.be.eventually.rejectedWith(ValueError, /empty/)
     })
 
     it('should store directory', async () => {
@@ -71,6 +56,34 @@ describe('IPFS provider', () => {
 
       expect(rootCid).to.be.a('string')
       expect(Object.values(dirResult).length).to.eq(5)
+      expect(dirResult).to.eql({
+        file: {
+          hash: 'QmSBpYfb6AM4ioR4qDeqP5wzbVP5z85fGsKUxvHSkvKTqg',
+          size: 12,
+          type: EntryType.FILE
+        },
+        'other-file': {
+          hash: 'QmSBpYfb6AM4ioR4qDeqP5wzbVP5z85fGsKUxvHSkvKTqg',
+          size: 12,
+          type: EntryType.FILE
+        },
+        folder: {
+          hash: 'QmUe2Cu2suPBjRqvDCZE9FJUjnG1BWCY3NCPBVPxunPRoe',
+          size: 111,
+          type: EntryType.DIRECTORY
+        },
+        'folder/and': {
+          hash: 'QmNz6geNPct9dZxmcgrHaCZn74uLAkrEYVwyDgR6GXPB6x',
+          size: 62,
+          type: EntryType.DIRECTORY
+        },
+        'folder/and/file':
+          {
+            hash: 'QmSBpYfb6AM4ioR4qDeqP5wzbVP5z85fGsKUxvHSkvKTqg',
+            size: 12,
+            type: EntryType.FILE
+          }
+      })
 
       const result = await ipfs.get(rootCid)
       expect(result.length).to.eq(6) // one more then dirResult because dirResult does not have the root folder
@@ -91,14 +104,6 @@ describe('IPFS provider', () => {
   })
 
   describe('.get()', () => {
-    it('should validate input', function () {
-      const inputs = [1, null, undefined, {}, []]
-
-      // @ts-ignore
-      const promises = inputs.map(entry => expect(provider.get(entry)).to.be.eventually.rejectedWith(ValueError))
-      return Promise.all(promises)
-    })
-
     it('should get file', async () => {
       const cid = (await ipfs.add(Buffer.from('hello world')))[0].hash
 

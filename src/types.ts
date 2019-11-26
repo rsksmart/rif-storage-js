@@ -1,4 +1,6 @@
 import { IpfsClient, CidAddress, ClientOptions } from 'ipfs-http-client'
+import { Bzz } from '@erebos/api-bzz-node'
+import { BzzConfig } from '@erebos/api-bzz-base'
 
 export enum Provider {
   LOCAL_STORAGE = 'local',
@@ -28,7 +30,7 @@ export interface Storage {
 
 export type Address = string
 
-export type Options = ClientOptions
+export type Options = ClientOptions | BzzConfig
 
 export interface DirectoryEntry {
   data: Buffer
@@ -56,10 +58,23 @@ export type DirectoryResult = Record<string, DirectoryResultEntry>
  *******************************************************/
 
 export interface IpfsStorageProvider extends Storage {
-  ipfs: IpfsClient
+  readonly ipfs: IpfsClient
+  put (data: Buffer): Promise<Address>
+  put (data: Directory): Promise<[Address, DirectoryResult]>
+
+  get (addresses: CidAddress): Promise<Directory | Buffer>
+  get (...addresses: Array<CidAddress>): Promise<Array<Directory | Buffer>>
+}
+
+/*******************************************************
+ ****************** SWARM INTEGRATION *******************
+ *******************************************************/
+
+export interface SwarmStorageProvider extends Storage {
+  readonly bzz: Bzz
   put (data: Buffer): Promise<Address>
   put (data: Directory): Promise<[Address, DirectoryResult]>
 
   get (addresses: Address): Promise<Directory | Buffer>
-  get (...addresses: Array<CidAddress>): Promise<Array<Directory | Buffer>>
+  get (...addresses: Array<Address>): Promise<Array<Directory | Buffer>>
 }

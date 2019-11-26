@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-// @ts-ignore
 import IPFSFactory, { FactoryOptions, Proc, SpawnOptions } from 'ipfsd-ctl'
 import ipfsClient, { IpfsClient } from 'ipfs-http-client'
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

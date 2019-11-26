@@ -61,7 +61,7 @@ Loading this module through a script tag will make the `Storage` obj available i
 This is a client library, therefore you need to provide access to the provider's running node for specifics see [Providers](#providers).
 
 ```javascript
-import RifStorage, { Provider } from 'rds-libj'
+import RifStorage, { Provider } from 'rds-libjs'
 
 // Connects to locally running node
 const storage = RifStorage(Provider.IPFS, { host: 'localhost', port: '5001', protocol: 'http' })
@@ -89,6 +89,7 @@ This library integrates several (decentralized) storage providers, currently sup
 ### IPFS
 
  > in-browsers node ✅
+ > nested directories ✅
 
 ```javascript
 RifStorage(Provider.IPFS, ipfsOptions)
@@ -97,6 +98,17 @@ RifStorage(Provider.IPFS, ipfsOptions)
 `ipfsOptions` are directly passed to [js-ipfs-http-client], hence check that for syntax and options.
 
 You can run a node directly in browser using [js-ipfs]. Just create instance and pass it instance instead of `ipfsOption`.
+
+### Swarm
+
+ > in-browsers node ❌
+ > nested directories ❌
+
+```javascript
+RifStorage(Provider.SWARM, swarmOptions)
+```
+
+`ipfsOptions` are directly passed to [Erebos], hence check that for syntax and options.
 
 ## API
 
@@ -117,3 +129,4 @@ There are some ways you can make this module better:
 
 [js-ipfs-http-client]: https://github.com/ipfs/js-ipfs-http-client/
 [js-ipfs]: https://github.com/ipfs/js-ipfs
+[Erebos]: https://erebos.js.org/docs/api-bzz
