@@ -17,11 +17,19 @@ describe('Swarm provider', () => {
   let provider: SwarmStorageProvider
   let bzz: Bzz
 
-  before(() => {
+  before(async () => {
     provider = swarmProvider({
       url: 'http://localhost:8500'
     })
     bzz = provider.bzz
+
+    try {
+      await bzz.upload('test')
+    } catch (e) {
+      if (e.name === 'FetchError' && e.message.includes('ECONNREFUSED')) {
+        expect.fail('Swarm node is not running! Cannot run tests. ')
+      }
+    }
   })
 
   describe('.put()', () => {
