@@ -1,6 +1,6 @@
 # RIF Storage lib.js
 
-[![Travis CI](https://flat.badgen.net/travis/rsksmart/rds-libjs)](https://travis-ci.com/rsksmart/rds-libjs)
+[![CircleCI](https://flat.badgen.net/circleci/github/rsksmart/rds-libjs)](https://circleci.com/gh/rsksmart/rds-libjs/)
 [![codecov](https://codecov.io/gh/rsksmart/rds-libjs/master/graph/badge.svg)](https://codecov.io/gh/rsksmart/rds-libjs) 
 [![Dependency Status](https://david-dm.org/rsksmart/rds-libjs.svg?style=flat-square)](https://david-dm.org/rsksmart/rds-libjs)
 [![](https://img.shields.io/badge/made%20by-IOVLabs-blue.svg?style=flat-square)](http://iovlabs.org)
@@ -85,10 +85,11 @@ const retrievedDirectory = storage.get(rootHash)
 This library integrates several (decentralized) storage providers, currently supported is:
  
  - [IPFS](https://ipfs.io/) using [js-ipfs-http-client]
+ - [Swarm](http://swarm-guide.readthedocs.io/) using [Erebos] library
 
 ### IPFS
 
- > in-browsers node ✅
+ > in-browser node ✅ <br>
  > nested directories ✅
 
 ```javascript
@@ -101,14 +102,14 @@ You can run a node directly in browser using [js-ipfs]. Just create instance and
 
 ### Swarm
 
- > in-browsers node ❌
+ > in-browser node ❌ <br>
  > nested directories ❌
 
 ```javascript
 RifStorage(Provider.SWARM, swarmOptions)
 ```
 
-`ipfsOptions` are directly passed to [Erebos], hence check that for syntax and options.
+`swarmOptions` are directly passed to [Erebos], hence check that for syntax and options.
 
 ## API
 
