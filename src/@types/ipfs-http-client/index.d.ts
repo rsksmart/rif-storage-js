@@ -29,7 +29,7 @@ declare module 'ipfs-http-client' {
     content?: Buffer
   }
 
-  namespace RegularFiles {
+  export namespace RegularFiles {
 
     export interface GetOptions extends Options {
       offset?: string

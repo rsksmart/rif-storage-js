@@ -89,8 +89,7 @@ This library integrates several (decentralized) storage providers, currently sup
 
 ### IPFS
 
- > in-browser node ✅ <br>
- > nested directories ✅
+ > in-browser node ✅ 
 
 ```javascript
 RifStorage(Provider.IPFS, ipfsOptions)
@@ -102,8 +101,7 @@ You can run a node directly in browser using [js-ipfs]. Just create instance and
 
 ### Swarm
 
- > in-browser node ❌ <br>
- > nested directories ❌
+ > in-browser node ❌ 
 
 ```javascript
 RifStorage(Provider.SWARM, swarmOptions)
@@ -121,8 +119,6 @@ There are some ways you can make this module better:
 
 - Consult our [open issues](https://github.com/rsksmart/rds-libjs/issues) and take on one of them
 - Help our tests reach 100% coverage!
-
-
 
 ## License
 

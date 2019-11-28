@@ -1,7 +1,7 @@
 import { ipfs as ipfsProvider } from '../../../src'
 import * as utils from '../../../src/utils'
 import { IpfsClient } from 'ipfs-http-client'
-import { IpfsStorageProvider } from '../../../src/types'
+import { IpfsStorage } from '../../../src/types'
 import createIpfs from './utils'
 
 import chai from 'chai'
@@ -15,7 +15,7 @@ const expect = chai.expect
 
 describe('IPFS provider', () => {
   let ipfs: IpfsClient
-  let provider: IpfsStorageProvider
+  let provider: IpfsStorage
   let teardown: () => Promise<void[]>
 
   before(async () => {
@@ -86,25 +86,6 @@ describe('IPFS provider', () => {
     //
     //   return expect(provider.get(cid)).to.be.eventually.fulfilled()
     // })
-
-    it('should get multiple files', async () => {
-      const cid1 = (await ipfs.add(Buffer.from('hello world1')))[0].hash
-      const cid2 = (await ipfs.add(Buffer.from('hello world2')))[0].hash
-      const cid3 = (await ipfs.add(Buffer.from('hello world3')))[0].hash
-
-      const fetchedFromIpfs = await provider.get(cid1, cid2, cid3)
-      expect(fetchedFromIpfs.length).to.equal(3)
-      fetchedFromIpfs.forEach((data) => {
-        expect(utils.isFile(data)).to.be.true()
-      })
-
-      const data = fetchedFromIpfs.map(b => b.toString())
-      expect(data).to.eql([
-        'hello world1',
-        'hello world2',
-        'hello world3'
-      ])
-    })
 
     it('should get directory', async () => {
       const emptyDir = (name: string): { path: string } => ({ path: `test-folder/${name}` })
