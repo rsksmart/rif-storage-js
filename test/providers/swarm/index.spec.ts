@@ -4,7 +4,7 @@ import { SwarmStorage } from '../../../src/types'
 import chai from 'chai'
 import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
-import { Bzz } from '@erebos/api-bzz-browser'
+import { Bzz } from '@erebos/api-bzz-node'
 import * as utils from '../../../src/utils'
 import debug from 'debug'
 
@@ -54,7 +54,10 @@ describe('Swarm provider', () => {
       }
 
       const rootCid = await provider.put(dir)
+      log(`uploaded directory ${rootCid}`)
+
       const result = await bzz.downloadDirectoryData(rootCid)
+      log(`downloaded directory ${result}`)
       expect(Object.keys(result).length).to.eq(2)
 
       // @ts-ignore

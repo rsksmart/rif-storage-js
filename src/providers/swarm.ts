@@ -6,7 +6,7 @@ import {
   SwarmStorage
 } from '../types'
 import { BzzConfig, UploadOptions } from '@erebos/api-bzz-base'
-import { Bzz } from '@erebos/api-bzz-browser'
+import { Bzz } from '@erebos/api-bzz-node'
 import { ValueError } from '../errors'
 import { markDirectory, markFile } from '../utils'
 import debug from 'debug'
