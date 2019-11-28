@@ -1,5 +1,12 @@
-import { Directory, DirectoryEntry, IpfsStorageProvider, Provider } from '../types'
-import ipfs, { BufferIpfsObject, CidAddress, ClientOptions, IpfsClient, IpfsObject } from 'ipfs-http-client'
+import { Directory, DirectoryEntry, IpfsStorage, Provider } from '../types'
+import ipfs, {
+  BufferIpfsObject,
+  CidAddress,
+  ClientOptions,
+  IpfsClient,
+  IpfsObject,
+  RegularFiles
+} from 'ipfs-http-client'
 import CID from 'cids'
 import { ValueError } from '../errors'
 import { markDirectory, markFile } from '../utils'
@@ -99,29 +106,11 @@ function validateAndmapDataToIpfs (data: Directory, validator: (entry: Directory
 }
 
 /**
- * Helper function for retrieving one File or Directory from IPFS
- *
- * @see IpfsFactory#get
- * @param address
- * @private
- */
-async function _get (this: IpfsStorageProvider, address: CidAddress): Promise<Directory | Buffer> {
-  const result = await this.ipfs.get(address)
-
-  // `result[0].content === undefined` means that downloaded empty directory
-  if (result.length > 1 || result[0].content === undefined) {
-    return markDirectory(mapDataFromIpfs(result, address))
-  }
-
-  return markFile(result[0].content)
-}
-
-/**
  *
  * @param options
  * @constructor
  */
-export default function IpfsFactory (options: ClientOptions | IpfsClient): IpfsStorageProvider {
+export default function IpfsFactory (options: ClientOptions | IpfsClient): IpfsStorage {
   const ipfsClient = isIpfs(options) ? options : ipfs(options)
 
   return {
@@ -132,16 +121,21 @@ export default function IpfsFactory (options: ClientOptions | IpfsClient): IpfsS
      * Retrieves data from IPFS
      *
      * @see Storage#get
-     * @param addresses - CID compatible address
+     * @param address - CID compatible address
+     * @param options
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async get (...addresses: Array<CidAddress>): Promise<any> {
-      addresses.forEach(validateAddress)
+    async get (address: CidAddress, options?: RegularFiles.GetOptions): Promise<any> {
+      validateAddress(address)
 
-      const getObject = _get.bind(this)
-      const data = await Promise.all(addresses.map(getObject))
+      const result = await this.ipfs.get(address, options)
 
-      return data.length === 1 ? data[0] : data
+      // `result[0].content === undefined` means that downloaded empty directory
+      if (result.length > 1 || result[0].content === undefined) {
+        return markDirectory(mapDataFromIpfs(result, address))
+      }
+
+      return markFile(result[0].content)
     },
 
     /**
@@ -149,11 +143,12 @@ export default function IpfsFactory (options: ClientOptions | IpfsClient): IpfsS
      *
      * @see Storage#put
      * @param data
+     * @param options
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async put (data: Buffer | Directory): Promise<any> {
+    async put (data: Buffer | Directory, options?: RegularFiles.AddOptions): Promise<any> {
       if (Buffer.isBuffer(data)) {
-        return (await this.ipfs.add(data))[0].hash
+        return (await this.ipfs.add(data, options))[0].hash
       }
 
       if (typeof data !== 'object' || Array.isArray(data) || data === null) {

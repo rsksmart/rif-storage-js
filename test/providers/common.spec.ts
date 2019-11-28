@@ -1,6 +1,6 @@
 import { ipfs as ipfsProvider, swarm as swarmProvider } from '../../src'
 import createIpfs from './ipfs/utils'
-import { IpfsStorageProvider, SwarmStorageProvider } from '../../src/types'
+import { Storage } from '../../src/types'
 import { ValueError } from '../../src/errors'
 
 import chai from 'chai'
@@ -13,13 +13,13 @@ chai.use(dirtyChai)
 const expect = chai.expect
 
 const PROVIDERS = {
-  async ipfs (): Promise<[IpfsStorageProvider, () => void]> {
+  async ipfs (): Promise<[Storage, () => void]> {
     const factory = createIpfs()
     const ipfs = await factory.setup()
     const teardown = factory.teardown
     return [ipfsProvider(ipfs), teardown]
   },
-  swarm (): Promise<[SwarmStorageProvider, () => void]> {
+  swarm (): Promise<[Storage, () => void]> {
     return Promise.resolve([swarmProvider({ url: 'http://localhost:8500' }), (): void => {}])
   }
 }
@@ -27,7 +27,7 @@ const PROVIDERS = {
 describe('Common providers tests', () => {
   Object.entries(PROVIDERS).forEach(([providerName, setup]) => {
     describe(`${providerName} provider`, () => {
-      let provider: IpfsStorageProvider | SwarmStorageProvider, teardown: () => void
+      let provider: Storage, teardown: () => void
 
       before(async () => {
         [provider, teardown] = await setup()
@@ -51,6 +51,10 @@ describe('Common providers tests', () => {
 
         it('should reject empty directory', () => {
           return expect(provider.put({})).to.be.eventually.rejectedWith(ValueError, /empty/)
+        })
+
+        it('should reject directory with empty property', () => {
+          return expect(provider.put({ '': { data: Buffer.from('asd') } })).to.be.eventually.rejectedWith(ValueError, 'Empty path (name of property) is not allowed')
         })
       })
 

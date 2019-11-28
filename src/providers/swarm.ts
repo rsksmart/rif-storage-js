@@ -3,9 +3,9 @@ import {
   Directory,
   DirectoryEntry,
   Provider,
-  SwarmStorageProvider
+  SwarmStorage
 } from '../types'
-import { BzzConfig } from '@erebos/api-bzz-base'
+import { BzzConfig, UploadOptions } from '@erebos/api-bzz-base'
 import { Bzz } from '@erebos/api-bzz-node'
 import { ValueError } from '../errors'
 import { markDirectory, markFile } from '../utils'
@@ -28,38 +28,6 @@ function validateDirectory (data: Directory, validator: (entry: DirectoryEntry) 
 }
 
 /**
- * Helper function for retrieving one File or Directory from Swarm
- *
- * @see SwarmFactory#get
- * @param address
- * @private
- */
-async function _get (this: SwarmStorageProvider, address: Address): Promise<Directory | Buffer> {
-  try {
-    const result = await this.bzz.list(address)
-
-    if (!result.entries) {
-      throw new ValueError(`Address ${address} does not contain any files/folders!`)
-    }
-
-    if (result.entries.length === 1) {
-      const file = await this.bzz.download(address)
-      return markFile(Buffer.from(await file.text()))
-    }
-  } catch (e) {
-    // Internal Server error is returned by Swarm when the address is not Manifest
-    if (e.status !== 500) {
-      throw e
-    }
-
-    const file = await this.bzz.download(address, { mode: 'raw' })
-    return markFile(Buffer.from(await file.text()))
-  }
-
-  return markDirectory(await this.bzz.downloadDirectoryData(address) as Directory)
-}
-
-/**
  * Factory for supporting Swarm
  *
  * Currently limitations:
@@ -68,7 +36,7 @@ async function _get (this: SwarmStorageProvider, address: Address): Promise<Dire
  * @param options
  * @constructor
  */
-export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStorageProvider {
+export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStorage {
   const bzz = isBzz(options) ? options : new Bzz(options)
 
   return {
@@ -78,20 +46,37 @@ export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStoragePro
     /**
      * Retrieves data from Swarm
      *
-     * @param addresses
+     * @param address
+     * @param options
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async get (...addresses: (Address)[]): Promise<any> {
-      addresses.forEach(address => {
-        if (typeof address !== 'string') {
-          throw new ValueError(`Address ${address} is not a string!`)
+    async get (address: Address, options?: UploadOptions): Promise<any> {
+      if (typeof address !== 'string') {
+        throw new ValueError(`Address ${address} is not a string!`)
+      }
+
+      try {
+        const result = await this.bzz.list(address)
+
+        if (!result.entries) {
+          throw new ValueError(`Address ${address} does not contain any files/folders!`)
         }
-      })
 
-      const getObject = _get.bind(this)
-      const data = await Promise.all(addresses.map(getObject))
+        if (result.entries.length === 1) {
+          const file = await this.bzz.download(address)
+          return markFile(Buffer.from(await file.text()))
+        }
+      } catch (e) {
+        // Internal Server error is returned by Swarm when the address is not Manifest
+        if (!('status' in e) || e.status !== 500) {
+          throw e
+        }
 
-      return data.length === 1 ? data[0] : data
+        const file = await this.bzz.download(address, { mode: 'raw' })
+        return markFile(Buffer.from(await file.text()))
+      }
+
+      return markDirectory(await this.bzz.downloadDirectoryData(address) as Directory)
     },
 
     /**
