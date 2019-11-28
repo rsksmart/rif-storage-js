@@ -53,10 +53,6 @@ jobs:
           paths:
             - ~/usr/local/lib/node_modules  # location depends on npm version
           key: node-v1-{{ .Branch }}-{{ checksum "package-lock.json" }}
-      - setup_remote_docker
-      - run:
-          name: "Run Swarm node"
-          command: ./start_swarm_node.sh -d
       - run:
           name: "Node tests"
           command: npx nyc -s npm run test:node -- --bail
