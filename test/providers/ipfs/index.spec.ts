@@ -13,10 +13,11 @@ chai.use(chaiAsPromised)
 chai.use(dirtyChai)
 const expect = chai.expect
 
-describe('IPFS provider', () => {
+describe('IPFS provider', function () {
   let ipfs: IpfsClient
   let provider: IpfsStorage
   let teardown: () => Promise<void[]>
+  this.timeout(20 * 1000)
 
   before(async () => {
     const factory = createIpfs()

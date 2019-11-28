@@ -26,8 +26,9 @@ const PROVIDERS = {
 
 describe('Common providers tests', () => {
   Object.entries(PROVIDERS).forEach(([providerName, setup]) => {
-    describe(`${providerName} provider`, () => {
+    describe(`${providerName} provider`, function () {
       let provider: Storage, teardown: () => void
+      this.timeout(20 * 1000)
 
       before(async () => {
         [provider, teardown] = await setup()
