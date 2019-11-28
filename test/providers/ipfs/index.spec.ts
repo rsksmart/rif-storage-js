@@ -1,13 +1,12 @@
 import { ipfs as ipfsProvider } from '../../../src'
 import * as utils from '../../../src/utils'
 import { IpfsClient } from 'ipfs-http-client'
-import { EntryType, IpfsStorageProvider } from '../../../src/types'
+import { IpfsStorageProvider } from '../../../src/types'
 import createIpfs from './utils'
 
 import chai from 'chai'
 import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
-import { ValueError } from '../../../src/errors'
 
 // Do not reorder these statements - https://github.com/chaijs/chai/issues/1298
 chai.use(chaiAsPromised)
@@ -52,38 +51,8 @@ describe('IPFS provider', () => {
         'folder/and/file': file
       }
 
-      const [rootCid, dirResult] = await provider.put(dir)
-
+      const rootCid = await provider.put(dir)
       expect(rootCid).to.be.a('string')
-      expect(Object.values(dirResult).length).to.eq(5)
-      expect(dirResult).to.eql({
-        file: {
-          hash: 'QmSBpYfb6AM4ioR4qDeqP5wzbVP5z85fGsKUxvHSkvKTqg',
-          size: 12,
-          type: EntryType.FILE
-        },
-        'other-file': {
-          hash: 'QmSBpYfb6AM4ioR4qDeqP5wzbVP5z85fGsKUxvHSkvKTqg',
-          size: 12,
-          type: EntryType.FILE
-        },
-        folder: {
-          hash: 'QmUe2Cu2suPBjRqvDCZE9FJUjnG1BWCY3NCPBVPxunPRoe',
-          size: 111,
-          type: EntryType.DIRECTORY
-        },
-        'folder/and': {
-          hash: 'QmNz6geNPct9dZxmcgrHaCZn74uLAkrEYVwyDgR6GXPB6x',
-          size: 62,
-          type: EntryType.DIRECTORY
-        },
-        'folder/and/file':
-          {
-            hash: 'QmSBpYfb6AM4ioR4qDeqP5wzbVP5z85fGsKUxvHSkvKTqg',
-            size: 12,
-            type: EntryType.FILE
-          }
-      })
 
       const result = await ipfs.get(rootCid)
       expect(result.length).to.eq(6) // one more then dirResult because dirResult does not have the root folder

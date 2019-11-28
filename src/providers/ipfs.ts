@@ -1,5 +1,5 @@
-import { Directory, DirectoryEntry, DirectoryResult, EntryType, IpfsStorageProvider, Provider } from '../types'
-import ipfs, { BufferIpfsObject, CidAddress, ClientOptions, IpfsClient, IpfsObject, IpfsResult } from 'ipfs-http-client'
+import { Directory, DirectoryEntry, IpfsStorageProvider, Provider } from '../types'
+import ipfs, { BufferIpfsObject, CidAddress, ClientOptions, IpfsClient, IpfsObject } from 'ipfs-http-client'
 import CID from 'cids'
 import { ValueError } from '../errors'
 import { markDirectory, markFile } from '../utils'
@@ -99,24 +99,6 @@ function validateAndmapDataToIpfs (data: Directory, validator: (entry: Directory
 }
 
 /**
- * Converts result of adding files to IPFS to DirectoryResult
- *
- * @private
- * @param inputData - original input Directory to identify in results what is File and what is Directory
- * @param results - IPFS data returned from ipfs.get()
- */
-function maIpfsResultToDirectoryResult (inputData: Directory, results: Array<IpfsResult>): DirectoryResult {
-  return results.reduce<DirectoryResult>((directory: DirectoryResult, result: IpfsResult): DirectoryResult => {
-    const { path, ...data } = result
-    directory[path] = {
-      type: path in inputData ? EntryType.FILE : EntryType.DIRECTORY,
-      ...data
-    }
-    return directory
-  }, {})
-}
-
-/**
  * Helper function for retrieving one File or Directory from IPFS
  *
  * @see IpfsFactory#get
@@ -186,8 +168,7 @@ export default function IpfsFactory (options: ClientOptions | IpfsClient): IpfsS
       const ipfsData = validateAndmapDataToIpfs(data, entry => Buffer.isBuffer(entry.data))
       const result = await this.ipfs.add(ipfsData, { wrapWithDirectory: true })
 
-      // First element is the root directory
-      return [result[result.length - 1].hash, maIpfsResultToDirectoryResult(data, result.slice(0, -1))]
+      return result[result.length - 1].hash
     }
   }
 }

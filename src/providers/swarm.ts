@@ -2,12 +2,11 @@ import {
   Address,
   Directory,
   DirectoryEntry,
-  DirectoryResult,
-  EntryType, Provider,
+  Provider,
   SwarmStorageProvider
 } from '../types'
 import { BzzConfig } from '@erebos/api-bzz-base'
-import { Bzz, ListEntry } from '@erebos/api-bzz-node'
+import { Bzz } from '@erebos/api-bzz-node'
 import { ValueError } from '../errors'
 import { markDirectory, markFile } from '../utils'
 
@@ -22,32 +21,10 @@ function validateDirectory (data: Directory, validator: (entry: DirectoryEntry) 
       throw new ValueError('Empty path (name of property) is not allowed!')
     }
 
-    if (path.includes('/')) {
-      // TODO: Related to https://github.com/MainframeHQ/erebos/issues/118
-      throw new ValueError('Swarm does not support nested paths currently!')
-    }
-
     if (!validator(entry)) {
       throw new ValueError(`Entry with path ${path} does not contain valid data!`)
     }
   })
-}
-
-async function fetchManifestAndMapData (this: SwarmStorageProvider, manifestHash: Address): Promise<DirectoryResult> {
-  const entries = await this.bzz.list(manifestHash)
-
-  if (!entries.entries) {
-    return {}
-  }
-
-  return entries.entries.reduce<DirectoryResult>((directory: DirectoryResult, result: ListEntry): DirectoryResult => {
-    directory[result.path] = {
-      hash: result.hash,
-      size: result.size,
-      type: EntryType.FILE
-    }
-    return directory
-  }, {})
 }
 
 /**
@@ -122,7 +99,7 @@ export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStoragePro
      *
      * @param data
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any,require-await
     async put (data: Buffer | Directory): Promise<any> {
       if (Buffer.isBuffer(data)) {
         return this.bzz.uploadFile(data)
@@ -138,10 +115,7 @@ export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStoragePro
       }
 
       validateDirectory(data, entry => Buffer.isBuffer(entry.data))
-      const manifestResult = await this.bzz.uploadDirectory(data)
-
-      // First element is the root directory
-      return [manifestResult, await fetchManifestAndMapData.call(this, manifestResult)]
+      return this.bzz.uploadDirectory(data)
     }
   }
 }

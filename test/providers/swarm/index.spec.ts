@@ -1,5 +1,5 @@
 import { swarm as swarmProvider } from '../../../src'
-import { EntryType, SwarmStorageProvider } from '../../../src/types'
+import { SwarmStorageProvider } from '../../../src/types'
 
 import chai from 'chai'
 import dirtyChai from 'dirty-chai'
@@ -48,23 +48,7 @@ describe('Swarm provider', () => {
         'other-file': file
       }
 
-      const [rootCid, dirResult] = await provider.put(dir)
-
-      expect(rootCid).to.be.a('string')
-      expect(Object.values(dirResult).length).to.eq(2)
-      expect(dirResult).to.eql({
-        file: {
-          hash: 'a12b2da0641f6e10d637c94e263b01b14abde7843fed09e7922bd0657bf761a7',
-          size: 4,
-          type: EntryType.FILE
-        },
-        'other-file': {
-          hash: 'a12b2da0641f6e10d637c94e263b01b14abde7843fed09e7922bd0657bf761a7',
-          size: 4,
-          type: EntryType.FILE
-        }
-      })
-
+      const rootCid = await provider.put(dir)
       const result = await bzz.downloadDirectoryData(rootCid)
       expect(Object.keys(result).length).to.eq(2)
 
@@ -78,7 +62,7 @@ describe('Swarm provider', () => {
     })
 
     // TODO: Related to https://github.com/MainframeHQ/erebos/issues/118
-    it.skip('should store directory with nested directories', async () => {
+    it('should store directory with nested directories', async () => {
       const file = { data: Buffer.from('data') }
 
       const dir = {
@@ -87,49 +71,16 @@ describe('Swarm provider', () => {
         'folder/and/file': file
       }
 
-      const [rootCid, dirResult] = await provider.put(dir)
-
+      const rootCid = await provider.put(dir)
       expect(rootCid).to.be.a('string')
-      expect(Object.values(dirResult).length).to.eq(5)
-      expect(dirResult).to.eql({
-        file: {
-          hash: 'a12b2da0641f6e10d637c94e263b01b14abde7843fed09e7922bd0657bf761a7',
-          size: 4,
-          type: EntryType.FILE
-        },
-        'other-file': {
-          hash: 'a12b2da0641f6e10d637c94e263b01b14abde7843fed09e7922bd0657bf761a7',
-          size: 4,
-          type: EntryType.FILE
-        },
-        folder: {
-          hash: 'QmUe2Cu2suPBjRqvDCZE9FJUjnG1BWCY3NCPBVPxunPRoe',
-          size: 111,
-          type: EntryType.DIRECTORY
-        },
-        'folder/and': {
-          hash: 'QmNz6geNPct9dZxmcgrHaCZn74uLAkrEYVwyDgR6GXPB6x',
-          size: 62,
-          type: EntryType.DIRECTORY
-        },
-        'folder/and/file':
-          {
-            hash: 'a12b2da0641f6e10d637c94e263b01b14abde7843fed09e7922bd0657bf761a7',
-            size: 4,
-            type: EntryType.FILE
-          }
-      })
 
       const result = await bzz.downloadDirectoryData(rootCid)
       expect(Object.keys(result).length).to.eq(3)
 
       // @ts-ignore
       Object.values(result).forEach(entry => entry.data && expect(entry.data.toString()).to.eq('data'))
-
       expect(Object.keys(result)).to.include.members([
         'file',
-        'folder',
-        'folder/and',
         'folder/and/file',
         'other-file'
       ])

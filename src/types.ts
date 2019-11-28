@@ -25,7 +25,7 @@ export interface Storage {
    * @return Address of the stored data
    */
   put (data: Buffer): Promise<Address>
-  put (data: Directory): Promise<[Address, DirectoryResult]>
+  put (data: Directory): Promise<Address>
 }
 
 export type Address = string
@@ -40,19 +40,6 @@ export interface DirectoryEntry {
 
 export type Directory = Record<string, DirectoryEntry>
 
-export enum EntryType {
-  FILE = 'file',
-  DIRECTORY = 'directory'
-}
-
-export interface DirectoryResultEntry {
-  hash: string
-  size: number
-  type: EntryType
-}
-
-export type DirectoryResult = Record<string, DirectoryResultEntry>
-
 /*******************************************************
  ****************** IPFS INTEGRATION *******************
  *******************************************************/
@@ -60,7 +47,7 @@ export type DirectoryResult = Record<string, DirectoryResultEntry>
 export interface IpfsStorageProvider extends Storage {
   readonly ipfs: IpfsClient
   put (data: Buffer): Promise<Address>
-  put (data: Directory): Promise<[Address, DirectoryResult]>
+  put (data: Directory): Promise<Address>
 
   get (addresses: CidAddress): Promise<Directory | Buffer>
   get (...addresses: Array<CidAddress>): Promise<Array<Directory | Buffer>>
@@ -73,7 +60,7 @@ export interface IpfsStorageProvider extends Storage {
 export interface SwarmStorageProvider extends Storage {
   readonly bzz: Bzz
   put (data: Buffer): Promise<Address>
-  put (data: Directory): Promise<[Address, DirectoryResult]>
+  put (data: Directory): Promise<Address>
 
   get (addresses: Address): Promise<Directory | Buffer>
   get (...addresses: Array<Address>): Promise<Array<Directory | Buffer>>

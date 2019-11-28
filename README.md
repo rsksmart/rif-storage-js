@@ -76,7 +76,7 @@ const directory = {
   'folder/with-file': { data: Buffer.from('nice essay')},
   'folder/with-other-folder/and-file': { data: Buffer.from('nice essay')}
 }
-const [rootHash, dirResult] = storage.put(directory)
+const rootHash = storage.put(directory)
 const retrievedDirectory = storage.get(rootHash)
 ```
 
