@@ -1,5 +1,5 @@
 import { IpfsClient, CidAddress, ClientOptions, RegularFiles } from 'ipfs-http-client'
-import { Bzz } from '@erebos/api-bzz-node'
+import { Bzz } from '@erebos/api-bzz-browser'
 import { BzzConfig, DownloadOptions, UploadOptions } from '@erebos/api-bzz-base'
 
 export enum Provider {

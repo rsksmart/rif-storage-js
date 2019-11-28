@@ -4,7 +4,7 @@ import { SwarmStorage } from '../../../src/types'
 import chai from 'chai'
 import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
-import { Bzz } from '@erebos/api-bzz-node'
+import { Bzz } from '@erebos/api-bzz-browser'
 import * as utils from '../../../src/utils'
 
 // Do not reorder these statements - https://github.com/chaijs/chai/issues/1298
