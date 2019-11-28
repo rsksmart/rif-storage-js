@@ -55,7 +55,7 @@ jobs:
           key: node-v1-{{ .Branch }}-{{ checksum "package-lock.json" }}
       - run:
           name: "Node tests"
-          command: npx nyc -s npm run test:node -- --bail
+          command: npm run test:node -- --bail
       - run:
           name: "Test coverage"
           command: npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov
