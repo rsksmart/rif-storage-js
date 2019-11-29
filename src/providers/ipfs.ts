@@ -10,6 +10,9 @@ import ipfs, {
 import CID from 'cids'
 import { ValueError } from '../errors'
 import { markDirectory, markFile } from '../utils'
+import debug from 'debug'
+
+const log = debug('rds:ipfs')
 
 function isIpfs (client: IpfsClient | ClientOptions): client is IpfsClient {
   client = client as IpfsClient
@@ -111,7 +114,17 @@ function validateAndmapDataToIpfs (data: Directory, validator: (entry: Directory
  * @constructor
  */
 export default function IpfsFactory (options: ClientOptions | IpfsClient): IpfsStorage {
-  const ipfsClient = isIpfs(options) ? options : ipfs(options)
+  let ipfsClient: IpfsClient
+
+  if (isIpfs(options)) {
+    ipfsClient = options
+    log('ipfs client using an embedded node')
+  } else {
+    ipfsClient = ipfs(options)
+
+    const addr = typeof options === 'string' ? options : options.host
+    log('ipfs client using http api to ', addr)
+  }
 
   return {
     ipfs: ipfsClient,
@@ -132,9 +145,11 @@ export default function IpfsFactory (options: ClientOptions | IpfsClient): IpfsS
 
       // `result[0].content === undefined` means that downloaded empty directory
       if (result.length > 1 || result[0].content === undefined) {
+        log(`fetching directory from ${address}`)
         return markDirectory(mapDataFromIpfs(result, address))
       }
 
+      log(`fetching single file from ${address}`)
       return markFile(result[0].content)
     },
 
@@ -148,8 +163,10 @@ export default function IpfsFactory (options: ClientOptions | IpfsClient): IpfsS
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async put (data: Buffer | Directory, options?: RegularFiles.AddOptions): Promise<any> {
       if (Buffer.isBuffer(data)) {
+        log('uploading single file')
         return (await this.ipfs.add(data, options))[0].hash
       }
+      log('uploading directory')
 
       if (typeof data !== 'object' || Array.isArray(data) || data === null) {
         throw new ValueError('data have to be Buffer or Directory object!')

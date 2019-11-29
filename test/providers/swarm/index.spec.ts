@@ -6,6 +6,9 @@ import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
 import { Bzz } from '@erebos/api-bzz-browser'
 import * as utils from '../../../src/utils'
+import debug from 'debug'
+
+const log = debug('rds:test:swarm')
 
 // Do not reorder these statements - https://github.com/chaijs/chai/issues/1298
 chai.use(chaiAsPromised)
@@ -34,8 +37,11 @@ describe('Swarm provider', () => {
   describe('.put()', () => {
     it('should store file', async () => {
       const hash = await provider.put(Buffer.from('hello world'))
+      log(`uploaded file ${hash}`)
 
       const result = await bzz.download(hash, { mode: 'raw' })
+      log(`downloaded file ${hash}`)
+
       expect(await result.text()).to.equal('hello world')
     })
 
