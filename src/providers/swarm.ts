@@ -9,6 +9,9 @@ import { BzzConfig, UploadOptions } from '@erebos/api-bzz-base'
 import { Bzz } from '@erebos/api-bzz-browser'
 import { ValueError } from '../errors'
 import { markDirectory, markFile } from '../utils'
+import debug from 'debug'
+
+const log = debug('rds:swarm')
 
 function isBzz (client: BzzConfig | Bzz): client is Bzz {
   client = client as Bzz
@@ -39,6 +42,10 @@ function validateDirectory (data: Directory, validator: (entry: DirectoryEntry) 
 export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStorage {
   const bzz = isBzz(options) ? options : new Bzz(options)
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  log(`swarm client connected to ${bzz.url}`)
+
   return {
     bzz,
     type: Provider.SWARM,
@@ -63,6 +70,7 @@ export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStorage {
         }
 
         if (result.entries.length === 1) {
+          log(`fetching single file from ${address}`)
           const file = await this.bzz.download(address)
           return markFile(Buffer.from(await file.text()))
         }
@@ -72,10 +80,12 @@ export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStorage {
           throw e
         }
 
+        log(`fetching single raw file from ${address}`)
         const file = await this.bzz.download(address, { mode: 'raw' })
         return markFile(Buffer.from(await file.text()))
       }
 
+      log(`fetching directory from ${address}`)
       return markDirectory(await this.bzz.downloadDirectoryData(address) as Directory)
     },
 
@@ -87,8 +97,10 @@ export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStorage {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,require-await
     async put (data: Buffer | Directory): Promise<any> {
       if (Buffer.isBuffer(data)) {
+        log('uploading single file')
         return this.bzz.uploadFile(data)
       }
+      log('uploading directory')
 
       if (typeof data !== 'object' || Array.isArray(data) || data === null) {
         throw new ValueError('data have to be Buffer or Directory object!')
