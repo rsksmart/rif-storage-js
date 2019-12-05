@@ -5,6 +5,7 @@
 declare module 'ipfs-http-client' {
   import multiaddr, { Multiaddr } from 'multiaddr'
   import CID from 'cids'
+  import { Readable } from 'stream'
 
   export type CidAddress = CID | Buffer | string
 
@@ -20,13 +21,9 @@ declare module 'ipfs-http-client' {
     hash: string
   }
 
-  export interface IpfsObject {
+  export interface IpfsObject<T> {
     path: string
-    content?: Buffer | AsyncIterator<Buffer> | ReadableStream
-  }
-
-  export interface BufferIpfsObject extends IpfsObject {
-    content?: Buffer
+    content?: T
   }
 
   export namespace RegularFiles {
@@ -67,7 +64,7 @@ declare module 'ipfs-http-client' {
     }
 
     export interface RegularFilesCommands {
-      add (data: Buffer | File | ReadableStream | Array<IpfsObject>, options?: AddOptions): Promise<Array<IpfsResult>>
+      add (data: Buffer | File | Readable | Array<IpfsObject<Buffer | File | Readable>>, options?: AddOptions): Promise<Array<IpfsResult>>
       // addFromFs
       // addFromStream
       // addFromUrl
@@ -75,14 +72,14 @@ declare module 'ipfs-http-client' {
 
       cat (path: CidAddress, options?: Options): AsyncIterator<Buffer>
 
-      _getAsyncIterator (path: CidAddress, options?: GetOptions): AsyncIterator<IpfsObject>
-      get (path: CidAddress, options?: GetOptions): Promise<Array<BufferIpfsObject>>
-      getReadableStream (path: CidAddress, options?: GetOptions): ReadableStream<IpfsObject>
+      _getAsyncIterator (path: CidAddress, options?: GetOptions): AsyncIterator<IpfsObject<Buffer>>
+      get (path: CidAddress, options?: GetOptions): Promise<Array<IpfsObject<Buffer>>>
+      getReadableStream (path: CidAddress, options?: GetOptions): Readable
       // getPullStream
 
       _lsAsyncIterator (path: CidAddress, options?: LsOptions): AsyncIterator<LsResult>
       ls (path: CidAddress, options?: LsOptions): Promise<Array<LsResult>>
-      lsReadableStream (path: CidAddress, options?: LsOptions): ReadableStream<LsResult>
+      lsReadableStream (path: CidAddress, options?: LsOptions): Readable
     }
 
   }

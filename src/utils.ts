@@ -1,3 +1,6 @@
+import { Directory, DirectoryArray } from './types'
+import { Readable } from 'stream'
+
 export const FILE_SYMBOL = Symbol.for('@rds-lib/file')
 export const DIRECTORY_SYMBOL = Symbol.for('@rds-lib/directory')
 
@@ -52,7 +55,7 @@ export function isFile (obj: object): boolean {
 }
 
 /**
- * Verifies if the retuned object is a directory
+ * Verifies if the returned object is a directory
  *
  * @param obj
  */
@@ -64,4 +67,41 @@ export function isDirectory (obj: object): boolean {
   // TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
   // @ts-ignore
   return Boolean(obj && obj[DIRECTORY_SYMBOL])
+}
+
+export function isTSDirectory<T> (data: object, genericTest: (entry: T) => boolean): data is Directory<T> {
+  if (typeof data !== 'object' || Array.isArray(data) || data === null) {
+    return false
+  }
+
+  return !Object.values(data).some(
+    entry => typeof entry !== 'object' ||
+      !('data' in entry) ||
+      !genericTest(entry.data)
+  )
+}
+
+export function isTSDirectoryArray<T> (data: object, genericTest: (entry: T) => boolean): data is DirectoryArray<T> {
+  if (!Array.isArray(data)) {
+    return false
+  }
+
+  return !data.some(
+    entry => typeof entry !== 'object' ||
+      !entry.data ||
+      !entry.path ||
+      !genericTest(entry.data)
+  )
+}
+
+export function isReadable (entry: unknown): entry is Readable {
+  return typeof entry === 'object' &&
+    entry !== null &&
+    typeof (entry as Readable).pipe === 'function' &&
+    (entry as Readable).readable !== false &&
+    typeof (entry as Readable)._read === 'function'
+}
+
+export function isReadableOrBuffer (entry: unknown): entry is Readable | Buffer {
+  return Buffer.isBuffer(entry) || isReadable(entry)
 }

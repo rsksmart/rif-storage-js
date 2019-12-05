@@ -1,10 +1,10 @@
 import ipfs from './providers/ipfs'
 import swarm from './providers/swarm'
-import { Storage, Provider, Options } from './types'
+import { Provider, Options, IpfsStorageProvider, SwarmStorageProvider } from './types'
 import { ClientOptions } from 'ipfs-http-client'
 import { BzzConfig } from '@erebos/api-bzz-base'
 
-function factory (provider: Provider, options: Options): Storage {
+function factory (provider: Provider, options: Options): IpfsStorageProvider | SwarmStorageProvider {
   switch (provider) {
     case Provider.IPFS:
       return ipfs(options as ClientOptions)

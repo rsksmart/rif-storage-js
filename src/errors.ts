@@ -19,6 +19,6 @@ export class ValueError extends RdsError {
 
   constructor (message: string) {
     super(message)
-    this.name = 'RdsError'
+    this.name = 'ValueError'
   }
 }

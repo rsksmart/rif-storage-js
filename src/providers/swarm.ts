@@ -1,15 +1,16 @@
 import {
-  Address,
-  Directory,
-  DirectoryEntry,
+  Address, AllPutInputs,
+  Directory, DirectoryArray,
   Provider,
-  SwarmStorage
+  SwarmStorageProvider
 } from '../types'
-import { BzzConfig, UploadOptions } from '@erebos/api-bzz-base'
+import { BzzConfig, UploadOptions, DownloadOptions } from '@erebos/api-bzz-base'
 import { Bzz } from '@erebos/api-bzz-node'
 import { ValueError } from '../errors'
-import { markDirectory, markFile } from '../utils'
+import { isTSDirectory, markDirectory, markFile, isReadable, isTSDirectoryArray, isReadableOrBuffer } from '../utils'
 import debug from 'debug'
+import { Readable } from 'stream'
+import tar from 'tar-stream'
 
 const log = debug('rds:swarm')
 
@@ -18,28 +19,248 @@ function isBzz (client: BzzConfig | Bzz): client is Bzz {
   return typeof client.download === 'function' && typeof client.downloadDirectoryData === 'function'
 }
 
-function validateDirectory (data: Directory, validator: (entry: DirectoryEntry) => boolean): void {
-  return Object.entries(data).forEach(([path, entry]) => {
-    if (path === '') {
-      throw new ValueError('Empty path (name of property) is not allowed!')
+function mapDirectoryArrayToArray<T> (data: DirectoryArray<T>): Directory<T> {
+  return data.reduce((previousValue: Directory<T>, currentValue) => {
+    if (isReadable(currentValue.data) && !currentValue.size && currentValue.size !== 0) {
+      throw new ValueError(`Missing "size" that is required for Readable streams (path: ${currentValue.path})`)
     }
 
-    if (!validator(entry)) {
-      throw new ValueError(`Entry with path ${path} does not contain valid data!`)
+    const path: string = currentValue.path
+    delete currentValue.path
+    previousValue[path] = currentValue
+    return previousValue
+  }, {})
+}
+
+function uploadStreamDirectory (client: Bzz, data: Directory<string | Readable | Buffer>): Promise<Address> {
+  const pack = tar.pack()
+  const entries = Object.entries(data)
+
+  if (entries.length === 0) {
+    throw new ValueError('Nothing to upload!')
+  }
+
+  async function loadEntries (): Promise<void> {
+    for (const [path, entry] of entries) {
+      if (Buffer.isBuffer(entry.data) || typeof entry.data === 'string') {
+        pack.entry({ name: path }, entry.data)
+      } else {
+        await new Promise((resolve, reject) => {
+          const entryStream = pack.entry({ name: path, size: entry.size }, err => {
+            if (err) reject(err)
+            else resolve()
+          });
+
+          (entry.data as Readable).pipe(entryStream)
+        })
+      }
+    }
+
+    pack.finalize()
+  }
+
+  // Fire-up loading entries without awaiting, in order to pass `pack` stream to `uploadFile`
+  // as soon as possible, so the streaming kicks in and don't buffer.
+  // The result is awaited in `uploadFile` because the response won't be returned before
+  // all the streaming is done and hence the Promise returned from `uploadFile` will be
+  // resolved with the hash we are looking for.
+  loadEntries()
+    .catch(err => {
+      pack.destroy(err)
+    })
+
+  return client.uploadFile(pack, { contentType: 'application/x-tar' })
+}
+
+/**
+ * Add data to Swarm
+ *
+ * @param data
+ * @param options
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,require-await
+async function put (this: SwarmStorageProvider, data: AllPutInputs, options?: UploadOptions): Promise<any> {
+  options = options || {}
+
+  if (Buffer.isBuffer(data) || typeof data === 'string') {
+    log('uploading single file')
+    return this.bzz.uploadFile(data, options)
+  }
+
+  if (isReadable(data)) {
+    if (!options.size) {
+      throw new ValueError('Missing "size" that is required for Readable streams')
+    }
+
+    return this.bzz.uploadFile(data, options)
+  }
+
+  log('uploading directory')
+
+  if ((typeof data !== 'object' && !Array.isArray(data)) || data === null) {
+    throw new TypeError('data have to be string, Readable, Buffer, DirectoryArray or Directory object!')
+  }
+
+  if ((Array.isArray(data) && data.length === 0) || Object.keys(data).length === 0) {
+    // TODO: [Q] Empty object should throw error? If not then what to return? https://github.com/rsksmart/rds-libjs/issues/4
+    throw new ValueError('You passed empty Directory')
+  }
+
+  if (isTSDirectory(data, isReadableOrBuffer)) {
+    Object.entries(data).forEach(([path, entry]) => {
+      if (path === '') {
+        throw new ValueError('Empty path (name of property) is not allowed!')
+      }
+
+      if (isReadable(entry.data) && !entry.size && entry.size !== 0) {
+        throw new ValueError(`Missing "size" that is required for Readable streams (path: ${path})`)
+      }
+    })
+    return uploadStreamDirectory(this.bzz, data)
+  } else if (isTSDirectoryArray(data, isReadableOrBuffer)) {
+    const mappedData = mapDirectoryArrayToArray(data)
+    return uploadStreamDirectory(this.bzz, mappedData)
+  } else {
+    throw new ValueError('Data has to be Readable or Directory<Readable> or DirectoryArray<Readable>')
+  }
+}
+
+/**
+ * Retrieves data from Swarm
+ *
+ * @param address
+ * @param options
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function get (this: SwarmStorageProvider, address: Address, options?: UploadOptions): Promise<any> {
+  if (typeof address !== 'string') {
+    throw new ValueError(`Address ${address} is not a string!`)
+  }
+
+  try {
+    const result = await this.bzz.list(address)
+
+    if (!result.entries) {
+      throw new ValueError(`Address ${address} does not contain any files/folders!`)
+    }
+
+    if (result.entries.length === 1) {
+      log(`fetching single file from ${address}`)
+      const file = await this.bzz.download(address, options)
+      return markFile(Buffer.from(await file.text()))
+    }
+  } catch (e) {
+    // Internal Server error is returned by Swarm when the address is not Manifest
+    if (!('status' in e) || e.status !== 500) {
+      throw e
+    }
+
+    log(`fetching single raw file from ${address}`)
+    const file = await this.bzz.download(address, Object.assign({ mode: 'raw' }, options))
+    return markFile(Buffer.from(await file.text()))
+  }
+
+  log(`fetching directory from ${address}`)
+  return markDirectory(await this.bzz.downloadDirectoryData(address) as Directory<Buffer>)
+}
+
+/**
+ * Helper function that fetch single raw file from Swarm returning Readable
+ *
+ * @param address
+ * @param options
+ * @private
+ */
+async function _getRawReadable (this: SwarmStorageProvider, address: Address, options: DownloadOptions): Promise<Readable> {
+  const stream = await this.bzz.downloadStream(address, Object.assign({ mode: 'raw' }, options))
+  const wrapperStream = new Readable({ objectMode: true })
+  wrapperStream._read = (): void => {}
+  wrapperStream.push({
+    data: stream,
+    path: ''
+  })
+  wrapperStream.push(null)
+
+  return wrapperStream
+}
+
+/**
+ * Helper function that fetch file(s)/directory (eq. hash is manifest) from Swarm
+ * returning Readable
+ *
+ * @param address
+ * @param options
+ * @private
+ */
+async function _getManifestReadable (this: SwarmStorageProvider, address: Address, options: DownloadOptions): Promise<Readable> {
+  if (options.headers == null) {
+    options.headers = {}
+  }
+  options.headers.accept = 'application/x-tar'
+
+  const tarRes = await this.bzz.downloadStream(address, options)
+  const readable = new Readable({ objectMode: true })
+  readable._read = (): void => {}
+
+  const extract = tar.extract()
+  extract.on('entry', (header, stream, next) => {
+    if (header.type === 'file') {
+      readable.push({
+        data: stream,
+        path: header.name,
+        size: header.size
+      })
+
+      stream.on('end', next)
+    } else {
+      next()
     }
   })
+  extract.on('finish', () => {
+    readable.push(null)
+  })
+  extract.on('error', (err) => {
+    readable.destroy(err)
+  })
+
+  tarRes.pipe(extract)
+  return readable
+}
+
+/**
+ * Fetch data from Swarm and return Readable in object mode that yield
+ * objects in format {data: <Readable>, path: 'string'}
+ * @param address
+ * @param options
+ */
+// eslint-disable-next-line require-await
+async function getReadable (this: SwarmStorageProvider, address: Address, options?: DownloadOptions): Promise<Readable> {
+  if (typeof address !== 'string') {
+    throw new ValueError(`Address ${address} is not a string!`)
+  }
+
+  options = options || {}
+
+  try {
+    return await _getManifestReadable.call(this, address, options)
+  } catch (e) {
+    // Internal Server error is returned by Swarm when the address is not Manifest
+    if (!e.status || e.status !== 500) {
+      throw e
+    }
+
+    log(`fetching single raw file from ${address}`)
+    return _getRawReadable.call(this, address, options)
+  }
 }
 
 /**
  * Factory for supporting Swarm
  *
- * Currently limitations:
- *  - no nested directories
- *
  * @param options
  * @constructor
  */
-export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStorage {
+export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStorageProvider {
   const bzz = isBzz(options) ? options : new Bzz(options)
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
@@ -50,69 +271,8 @@ export default function SwarmFactory (options: BzzConfig | Bzz): SwarmStorage {
     bzz,
     type: Provider.SWARM,
 
-    /**
-     * Retrieves data from Swarm
-     *
-     * @param address
-     * @param options
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async get (address: Address, options?: UploadOptions): Promise<any> {
-      if (typeof address !== 'string') {
-        throw new ValueError(`Address ${address} is not a string!`)
-      }
-
-      try {
-        const result = await this.bzz.list(address)
-
-        if (!result.entries) {
-          throw new ValueError(`Address ${address} does not contain any files/folders!`)
-        }
-
-        if (result.entries.length === 1) {
-          log(`fetching single file from ${address}`)
-          const file = await this.bzz.download(address)
-          return markFile(Buffer.from(await file.text()))
-        }
-      } catch (e) {
-        // Internal Server error is returned by Swarm when the address is not Manifest
-        if (!('status' in e) || e.status !== 500) {
-          throw e
-        }
-
-        log(`fetching single raw file from ${address}`)
-        const file = await this.bzz.download(address, { mode: 'raw' })
-        return markFile(Buffer.from(await file.text()))
-      }
-
-      log(`fetching directory from ${address}`)
-      return markDirectory(await this.bzz.downloadDirectoryData(address) as Directory)
-    },
-
-    /**
-     * Add data to Swarm
-     *
-     * @param data
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any,require-await
-    async put (data: Buffer | Directory): Promise<any> {
-      if (Buffer.isBuffer(data)) {
-        log('uploading single file')
-        return this.bzz.uploadFile(data)
-      }
-      log('uploading directory')
-
-      if (typeof data !== 'object' || Array.isArray(data) || data === null) {
-        throw new ValueError('data have to be Buffer or Directory object!')
-      }
-
-      if (Object.keys(data).length === 0) {
-        // TODO: [Q] Empty object should throw error? If not then what to return? https://github.com/rsksmart/rds-libjs/issues/4
-        throw new ValueError('You passed empty Directory')
-      }
-
-      validateDirectory(data, entry => Buffer.isBuffer(entry.data))
-      return this.bzz.uploadDirectory(data)
-    }
+    get,
+    getReadable,
+    put
   }
 }

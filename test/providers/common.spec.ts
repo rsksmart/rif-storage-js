@@ -1,6 +1,6 @@
 import { ipfs as ipfsProvider, swarm as swarmProvider } from '../../src'
 import createIpfs from './ipfs/utils'
-import { Storage } from '../../src/types'
+import { IpfsStorageProvider, SwarmStorageProvider } from '../../src/types'
 import { ValueError } from '../../src/errors'
 
 import chai from 'chai'
@@ -13,13 +13,13 @@ chai.use(dirtyChai)
 const expect = chai.expect
 
 const PROVIDERS = {
-  async ipfs (): Promise<[Storage, () => void]> {
+  async ipfs (): Promise<[IpfsStorageProvider, () => void]> {
     const factory = createIpfs()
     const ipfs = await factory.setup()
     const teardown = factory.teardown
     return [ipfsProvider(ipfs), teardown]
   },
-  swarm (): Promise<[Storage, () => void]> {
+  swarm (): Promise<[SwarmStorageProvider, () => void]> {
     return Promise.resolve([swarmProvider({ url: 'http://localhost:8500' }), (): void => {}])
   }
 }
@@ -27,8 +27,8 @@ const PROVIDERS = {
 describe('Common providers tests', () => {
   Object.entries(PROVIDERS).forEach(([providerName, setup]) => {
     describe(`${providerName} provider`, function () {
-      let provider: Storage, teardown: () => void
-      this.timeout(20 * 1000)
+      let provider: IpfsStorageProvider | SwarmStorageProvider, teardown: () => void
+      this.timeout(10 * 1000)
 
       before(async () => {
         [provider, teardown] = await setup()
@@ -38,20 +38,29 @@ describe('Common providers tests', () => {
         teardown()
       })
 
-      describe('put()', () => {
+      describe('put', () => {
         it('should validate data', () => {
           const inputs = [
-            1, 'string', null, undefined, [], {}, { 'some-path': '' }, { '': '' }, { 'some-path': {} },
-            { 'some-path': { data: '' } }, { 'some-path': { data: {} } }, { 'some-path': { data: null } }
+            [1, TypeError],
+            [null, TypeError],
+            [undefined, TypeError],
+            [[], ValueError],
+            [{}, ValueError],
+            [{ 'some-path': '' }, ValueError],
+            [{ '': '' }, ValueError],
+            [{ 'some-path': {} }, ValueError],
+            [{ 'some-path': { data: '' } }, ValueError],
+            [{ 'some-path': { data: {} } }, ValueError],
+            [{ 'some-path': { data: null } }, ValueError]
           ]
-
           // @ts-ignore
-          const promises = inputs.map(entry => expect(provider.put(entry), `failing with ${JSON.stringify(entry)}`).to.be.eventually.rejectedWith(ValueError))
+          const promises = inputs.map(([entry, err]) => expect(provider.put(entry), `failing with ${JSON.stringify(entry)}`).to.be.eventually.rejectedWith(err))
           return Promise.all(promises)
         })
 
-        it('should reject empty directory', () => {
-          return expect(provider.put({})).to.be.eventually.rejectedWith(ValueError, /empty/)
+        it('should reject empty directory', async () => {
+          await expect(provider.put({})).to.be.eventually.rejectedWith(ValueError)
+          await expect(provider.put([])).to.be.eventually.rejectedWith(ValueError)
         })
 
         it('should reject directory with empty property', () => {
@@ -65,6 +74,14 @@ describe('Common providers tests', () => {
 
           // @ts-ignore
           const promises = inputs.map(entry => expect(provider.get(entry)).to.be.eventually.rejectedWith(ValueError))
+          return Promise.all(promises)
+        })
+
+        it('getReadable() should validate input', function () {
+          const inputs = [1, null, undefined, {}, []]
+
+          // @ts-ignore
+          const promises = inputs.map(entry => expect(provider.getReadable(entry)).to.be.eventually.rejectedWith(ValueError))
           return Promise.all(promises)
         })
       })
