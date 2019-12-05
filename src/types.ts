@@ -1,6 +1,7 @@
-import { IpfsClient, CidAddress, ClientOptions, RegularFiles } from 'ipfs-http-client'
+import { IpfsClient, CidAddress, ClientOptions } from 'ipfs-http-client'
 import { Bzz } from '@erebos/api-bzz-node'
-import { BzzConfig, DownloadOptions, UploadOptions } from '@erebos/api-bzz-base'
+import { BzzConfig } from '@erebos/api-bzz-base'
+import { Readable } from 'stream'
 
 export enum Provider {
   LOCAL_STORAGE = 'local',
@@ -8,16 +9,39 @@ export enum Provider {
   SWARM = 'swarm',
 }
 
-export interface Storage {
+export type Address = string
+
+export type Options = ClientOptions | BzzConfig
+
+export interface DirectoryEntry<T> {
+  data: T
+  contentType?: string
+  size?: number
+}
+
+export type Directory<T> = Record<string, DirectoryEntry<T>>
+
+export type DirectoryArrayEntry<T> = DirectoryEntry<T> & { path: string }
+export type DirectoryArray<T> = Array<DirectoryArrayEntry<T>>
+
+export type AllPutInputs =
+  string
+  | Buffer
+  | Readable
+  | Directory<string | Buffer | Readable>
+  | DirectoryArray<Buffer | Readable>
+
+export interface StorageProvider<Addr, GetOpts, PutOpts> {
   readonly type: Provider
 
   /**
    * Retrieves data from provider's network
-   * @param addresses
+   * @param address
    * @param options
    * @return Buffer with data
    */
-  get (addresses: Address, options?: object): Promise<Directory | Buffer>
+  get (address: Addr, options?: GetOpts): Promise<Directory<Buffer> | Buffer>
+  getReadable (address: Addr, options?: GetOpts): Promise<Readable>
 
   /**
    * Stores data on provider's network
@@ -25,42 +49,23 @@ export interface Storage {
    * @param options
    * @return Address of the stored data
    */
-  put (data: Buffer, options?: object): Promise<Address>
-  put (data: Directory, options?: object): Promise<Address>
+  put (data: string | Buffer | Readable, options?: PutOpts): Promise<Addr>
+  put (data: Directory<string | Buffer | Readable> | DirectoryArray<Buffer | Readable>, options?: PutOpts): Promise<Addr>
 }
-
-export type Address = string
-
-export type Options = ClientOptions | BzzConfig
-
-export interface DirectoryEntry {
-  data: Buffer
-  contentType?: string
-  size?: number
-}
-
-export type Directory = Record<string, DirectoryEntry>
 
 /*******************************************************
  ****************** IPFS INTEGRATION *******************
  *******************************************************/
 
-export interface IpfsStorage extends Storage {
+export interface IpfsStorageProvider
+  extends StorageProvider<CidAddress, object, object> {
   readonly ipfs: IpfsClient
-  put (data: Buffer, options?: RegularFiles.AddOptions): Promise<Address>
-  put (data: Directory, options?: RegularFiles.AddOptions): Promise<Address>
-
-  get (addresses: CidAddress, options?: RegularFiles.GetOptions): Promise<Directory | Buffer>
 }
 
 /*******************************************************
  ****************** SWARM INTEGRATION *******************
  *******************************************************/
 
-export interface SwarmStorage extends Storage {
+export interface SwarmStorageProvider extends StorageProvider<Address, object, object> {
   readonly bzz: Bzz
-  put (data: Buffer, options?: UploadOptions): Promise<Address>
-  put (data: Directory, options?: UploadOptions): Promise<Address>
-
-  get (addresses: Address, options?: DownloadOptions): Promise<Directory | Buffer>
 }

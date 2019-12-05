@@ -1,5 +1,5 @@
 import { swarm as swarmProvider } from '../../../src'
-import { SwarmStorage } from '../../../src/types'
+import { DirectoryArrayEntry, SwarmStorageProvider } from '../../../src/types'
 
 import chai from 'chai'
 import dirtyChai from 'dirty-chai'
@@ -7,6 +7,8 @@ import chaiAsPromised from 'chai-as-promised'
 import { Bzz } from '@erebos/api-bzz-node'
 import * as utils from '../../../src/utils'
 import debug from 'debug'
+import { createReadable, streamToString } from '../../utils'
+import { Readable } from 'stream'
 
 const log = debug('rds:test:swarm')
 
@@ -16,7 +18,7 @@ chai.use(dirtyChai)
 const expect = chai.expect
 
 describe('Swarm provider', () => {
-  let provider: SwarmStorage
+  let provider: SwarmStorageProvider
   let bzz: Bzz
 
   before(async () => {
@@ -110,6 +112,99 @@ describe('Swarm provider', () => {
         'other-file'
       ])
     })
+
+    it('should store readable file', async () => {
+      const hash = await provider.put(createReadable('hello world'), { size: 11 })
+      log(`uploaded file ${hash}`)
+
+      const result = await bzz.download(hash, { mode: 'raw' })
+      log(`downloaded file ${hash}`)
+
+      expect(await result.text()).to.equal('hello world')
+    })
+
+    it('should store directory in Directory format with readable', async () => {
+      const file = (): { data: Readable, size: number } => { return { data: createReadable('data'), size: 4 } }
+
+      const dir = {
+        file: file(),
+        'other-file': file(),
+        'some/folder/file': file()
+      }
+
+      const rootHash = await provider.put(dir)
+      log(`uploaded directory ${rootHash}`)
+
+      const result = await bzz.downloadDirectoryData(rootHash)
+      log(`downloaded directory ${result}`)
+      expect(Object.keys(result).length).to.eq(3)
+
+      // @ts-ignore
+      Object.values(result).forEach(entry => entry.data && expect(entry.data.toString()).to.eq('data'))
+
+      expect(Object.keys(result)).to.include.members([
+        'file',
+        'some/folder/file',
+        'other-file'
+      ])
+    })
+
+    it('should store directory in DirectoryArray format with readable', async () => {
+      const file = (path: string): DirectoryArrayEntry<Readable> => {
+        return {
+          path,
+          data: createReadable('data'),
+          size: 4
+        }
+      }
+
+      const dir = [
+        file('file'),
+        file('other-file'),
+        file('some/folder/other-file')
+      ]
+
+      const rootHash = await provider.put(dir)
+      log(`uploaded directory ${rootHash}`)
+
+      const result = await bzz.downloadDirectoryData(rootHash)
+      log(`downloaded directory ${result}`)
+      expect(Object.keys(result).length).to.eq(3)
+
+      // @ts-ignore
+      Object.values(result).forEach(entry => entry.data && expect(entry.data.toString()).to.eq('data'))
+
+      expect(Object.keys(result)).to.include.members([
+        'file',
+        'other-file'
+      ])
+    })
+
+    it('should store directory with mixed styles nested directories', async () => {
+      const file = (): { data: Readable, size: number } => { return { data: createReadable('data'), size: 4 } }
+
+      const dir = {
+        file: file(),
+        'other-file': file(),
+        'buffer-file': { data: Buffer.from('data') },
+        'folder/and/file': file()
+      }
+
+      const rootCid = await provider.put(dir)
+      expect(rootCid).to.be.a('string')
+
+      const result = await bzz.downloadDirectoryData(rootCid)
+      expect(Object.keys(result).length).to.eq(4)
+
+      // @ts-ignore
+      Object.values(result).forEach(entry => entry.data && expect(entry.data.toString()).to.eq('data'))
+      expect(Object.keys(result)).to.include.members([
+        'file',
+        'folder/and/file',
+        'other-file',
+        'buffer-file'
+      ])
+    })
   })
 
   describe('.get()', () => {
@@ -129,18 +224,51 @@ describe('Swarm provider', () => {
       expect(fetched.toString()).to.equal('hello world')
     })
 
+    it.skip('should get readable file', async () => {
+      const hash = (await bzz.uploadFile(Buffer.from('hello world'), { contentType: 'plain/text' }))
+
+      const stream = await provider.getReadable(hash)
+      let count = 0
+
+      for await (const streamElement of stream) {
+        expect(streamElement).to.be.a('object')
+        const result = await streamToString(streamElement.data)
+        expect(result).to.equal('hello world')
+        count++
+      }
+
+      expect(count).eql(1)
+    })
+
+    it('should get raw readable file', async () => {
+      const hash = (await bzz.uploadFile(Buffer.from('hello world')))
+
+      const stream = await provider.getReadable(hash)
+      let count = 0
+
+      for await (const streamElement of stream) {
+        expect(streamElement).to.be.a('object')
+        const result = await streamToString(streamElement.data)
+        expect(result).to.equal('hello world')
+        count++
+      }
+
+      expect(count).eql(1)
+    })
+
     // it('should throw when not found', () => {
     //   const cid = 'QmY2ERw3nB19tVKKVF18Wq5idNL91gaNzCk1eaSq6S1J1i'
     //
     //   return expect(provider.get(cid)).to.be.eventually.fulfilled()
     // })
 
-    it('should get flat directory', async () => {
+    it('should get directory', async () => {
       const file = { data: Buffer.from('some-data') }
 
       const dir = {
         file: file,
-        'other-file': file
+        'other-file': file,
+        'folder/and/some/file': file
       }
       const result = await bzz.uploadDirectory(dir)
 
@@ -151,6 +279,7 @@ describe('Swarm provider', () => {
         [
           'file',
           'other-file',
+          'folder/and/some/file',
           utils.DIRECTORY_SYMBOL
         ]
       )
@@ -159,6 +288,32 @@ describe('Swarm provider', () => {
         size: 9,
         data: Buffer.from('some-data')
       }))
+    })
+
+    it('should get directory with readable', async () => {
+      const file = { data: Buffer.from('some-data') }
+
+      const dir = {
+        file: file,
+        'folder/and/some/file': file,
+        'other-file': file
+      }
+      const result = await bzz.uploadDirectory(dir)
+
+      const stream = await provider.getReadable(result)
+
+      let count = 0
+      const retrievedPaths = []
+      for await (const streamElement of stream) {
+        expect(streamElement).to.be.a('object')
+        const result = await streamToString(streamElement.data)
+        expect(result).to.equal('some-data')
+        retrievedPaths.push(streamElement.path)
+        count++
+      }
+
+      expect(count).eql(3)
+      expect(retrievedPaths).to.eql(Object.keys(dir))
     })
   })
 })
