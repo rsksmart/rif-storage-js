@@ -1,14 +1,14 @@
 import { swarm as swarmProvider } from '../../../src'
 import { DirectoryArrayEntry, SwarmStorageProvider } from '../../../src/types'
-
-import chai from 'chai'
-import dirtyChai from 'dirty-chai'
-import chaiAsPromised from 'chai-as-promised'
 import { Bzz } from '@erebos/api-bzz-node'
 import * as utils from '../../../src/utils'
 import debug from 'debug'
 import { createReadable, streamToString } from '../../utils'
 import { Readable } from 'stream'
+
+import chai from 'chai'
+import dirtyChai from 'dirty-chai'
+import chaiAsPromised from 'chai-as-promised'
 
 const log = debug('rds:test:swarm')
 

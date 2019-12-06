@@ -1,4 +1,4 @@
-import { Directory, IpfsStorageProvider, Provider, AllPutInputs } from '../types'
+import { Directory, IpfsStorageProvider, Provider, PutInputs } from '../types'
 import ipfs, {
   CidAddress,
   ClientOptions,
@@ -111,7 +111,7 @@ function mapDataToIpfs<T> (data: Directory<T>): Array<IpfsObject<T>> {
  * @param options
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function put (this: IpfsStorageProvider, data: AllPutInputs, options?: RegularFiles.AddOptions): Promise<any> {
+async function put (this: IpfsStorageProvider, data: PutInputs, options?: RegularFiles.AddOptions): Promise<any> {
   options = options || {}
 
   if (typeof data === 'string') {
@@ -181,6 +181,7 @@ async function get (this: IpfsStorageProvider, address: CidAddress, options?: Re
  *
  * @param address
  * @param options
+ * @see Storage#getReadable
  */
 // eslint-disable-next-line require-await
 async function getReadable (this: IpfsStorageProvider, address: CidAddress, options?: RegularFiles.GetOptions): Promise<Readable> {

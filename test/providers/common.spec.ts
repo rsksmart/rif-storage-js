@@ -20,6 +20,7 @@ const PROVIDERS = {
     return [ipfsProvider(ipfs), teardown]
   },
   swarm (): Promise<[SwarmStorageProvider, () => void]> {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     return Promise.resolve([swarmProvider({ url: 'http://localhost:8500' }), (): void => {}])
   }
 }
