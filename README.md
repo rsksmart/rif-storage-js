@@ -1,8 +1,8 @@
-# RIF Storage lib.js
+# RIF Storage.js
 
-[![CircleCI](https://flat.badgen.net/circleci/github/rsksmart/rds-libjs)](https://circleci.com/gh/rsksmart/rds-libjs/)
-[![codecov](https://codecov.io/gh/rsksmart/rds-libjs/master/graph/badge.svg)](https://codecov.io/gh/rsksmart/rds-libjs) 
-[![Dependency Status](https://david-dm.org/rsksmart/rds-libjs.svg?style=flat-square)](https://david-dm.org/rsksmart/rds-libjs)
+[![CircleCI](https://flat.badgen.net/circleci/github/rsksmart/rif-storage-js)](https://circleci.com/gh/rsksmart/rif-storage-js/)
+[![codecov](https://codecov.io/gh/rsksmart/rif-storage-js/master/graph/badge.svg)](https://codecov.io/gh/rsksmart/rif-storage-js) 
+[![Dependency Status](https://david-dm.org/rsksmart/rif-storage-js.svg?style=flat-square)](https://david-dm.org/rsksmart/rif-storage-js)
 [![](https://img.shields.io/badge/made%20by-IOVLabs-blue.svg?style=flat-square)](http://iovlabs.org)
 [![](https://img.shields.io/badge/project-RIF%20Storage-blue.svg?style=flat-square)](https://www.rifos.org/)
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
@@ -32,29 +32,29 @@
 ### npm
 
 ```sh
-> npm install rds-libjs
+> npm install rif-storage
 ```
 
 ### Use in Node.js
 
 ```js
-var RifStorage = require('rds-libjs')
+var RifStorage = require('rif-storage')
 ```
 
 ### Use in a browser with browserify, webpack or any other bundler
 
 ```js
-var RifStorage = require('rds-libjs')
+var RifStorage = require('rif-storage')
 ```
 
 ### Use in a browser Using a script tag
 
-Loading this module through a script tag will make the `Storage` obj available in the global namespace.
+Loading this module through a script tag will make the `RifStorage` obj available in the global namespace.
 
 ```html
-<script src="https://unpkg.com/rds-libjs/dist/index.min.js"></script>
+<script src="https://unpkg.com/rif-storage/dist/index.min.js"></script>
 <!-- OR -->
-<script src="https://unpkg.com/rds-libjs/dist/index.js"></script>
+<script src="https://unpkg.com/rif-storage/dist/index.js"></script>
 ```
 
 ## Usage
@@ -62,7 +62,7 @@ Loading this module through a script tag will make the `Storage` obj available i
 This is a client library, therefore you need to provide access to the provider's running node for specifics see [Providers](#providers).
 
 ```javascript
-import RifStorage, { Provider } from 'rds-libjs'
+import RifStorage, { Provider } from 'rif-storage'
 
 // Connects to locally running node
 const storage = RifStorage(Provider.IPFS, { host: 'localhost', port: '5001', protocol: 'http' })
@@ -118,7 +118,7 @@ TBD
 
 There are some ways you can make this module better:
 
-- Consult our [open issues](https://github.com/rsksmart/rds-libjs/issues) and take on one of them
+- Consult our [open issues](https://github.com/rsksmart/rif-storage-js/issues) and take on one of them
 - Help our tests reach 100% coverage!
 
 ## License

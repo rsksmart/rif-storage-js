@@ -1,5 +1,5 @@
 {
-  "name": "rds-libjs",
+  "name": "rif-storage",
   "version": "0.1.0",
   "description": "Library integrating distributed storage projects",
   "keywords": [
@@ -11,9 +11,9 @@
     "@erebos/api-bzz-node": "@erebos/api-bzz-browser",
     "stream": "readable-stream"
   },
-  "homepage": "https://github.com/rsksmart/rds-libjs",
+  "homepage": "https://github.com/rsksmart/rif-storage-js",
   "bugs": {
-    "url": "https://github.com/rsksmart/rds-libjs/issues/"
+    "url": "https://github.com/rsksmart/rif-storage-js/issues/"
   },
   "license": "MIT",
   "files": [
@@ -24,7 +24,7 @@
   "main": "src/index.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rsksmart/rds-libjs.git"
+    "url": "https://github.com/rsksmart/rif-storage-js.git"
   },
   "scripts": {
     "compile": "tasegir compile",
@@ -65,7 +65,7 @@
     "ipfsd-ctl": "^0.47.4",
     "merge-options": "^2.0.0",
     "sinon": "^7.5.0",
-    "tasegir": "^1.3.2"
+    "tasegir": "^1.3.3"
   },
   "engines": {
     "node": ">=10.0.0",
