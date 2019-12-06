@@ -1,5 +1,5 @@
 import {
-  Address, AllPutInputs,
+  Address, PutInputs,
   Directory, DirectoryArray,
   Provider,
   SwarmStorageProvider
@@ -79,7 +79,7 @@ function uploadStreamDirectory (client: Bzz, data: Directory<string | Readable |
  * @param options
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,require-await
-async function put (this: SwarmStorageProvider, data: AllPutInputs, options?: UploadOptions): Promise<any> {
+async function put (this: SwarmStorageProvider, data: PutInputs, options?: UploadOptions): Promise<any> {
   options = options || {}
 
   if (Buffer.isBuffer(data) || typeof data === 'string') {
@@ -174,6 +174,7 @@ async function get (this: SwarmStorageProvider, address: Address, options?: Uplo
 async function _getRawReadable (this: SwarmStorageProvider, address: Address, options: DownloadOptions): Promise<Readable> {
   const stream = await this.bzz.downloadStream(address, Object.assign({ mode: 'raw' }, options))
   const wrapperStream = new Readable({ objectMode: true })
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   wrapperStream._read = (): void => {}
   wrapperStream.push({
     data: stream,
@@ -200,6 +201,7 @@ async function _getManifestReadable (this: SwarmStorageProvider, address: Addres
 
   const tarRes = await this.bzz.downloadStream(address, options)
   const readable = new Readable({ objectMode: true })
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   readable._read = (): void => {}
 
   const extract = tar.extract()

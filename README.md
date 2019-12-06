@@ -67,8 +67,8 @@ import RifStorage, { Provider } from 'rif-storage'
 // Connects to locally running node
 const storage = RifStorage(Provider.IPFS, { host: 'localhost', port: '5001', protocol: 'http' })
 
-const fileHash = storage.put(Buffer.from('hello world!'))
-const retrievedData = storage.get(fileHash) // Returns Buffer
+const fileHash = await storage.put(Buffer.from('hello world!'))
+const retrievedData = await storage.get(fileHash) // Returns Buffer
 console.log(retrievedData.toString()) // prints 'hello world!'
 
 const directory = {
@@ -77,8 +77,32 @@ const directory = {
   'folder/with-file': { data: Buffer.from('nice essay')},
   'folder/with-other-folder/and-file': { data: Buffer.from('nice essay')}
 }
-const rootHash = storage.put(directory)
-const retrievedDirectory = storage.get(rootHash)
+const rootHash = await storage.put(directory)
+const retrievedDirectory = await storage.get(rootHash)
+```
+
+### Manager
+
+This tool ships with utility class `Manager` that that supports easy usage of multiple providers in your applications.
+It allows registration of all supported providers and then easy putting/getting data with
+the same interface as providers.
+
+```javascript
+import { Manager, Provider } from 'rif-storage'
+
+const storage = new Manager()
+
+// The first added provider becomes also the active one
+storage.addProvider(Provider.IPFS, { host: 'localhost', port: '5001', protocol: 'http' })
+storage.addProvider(Provider.SWARM, { url: 'http://localhost:8500' })
+
+const ipfsHash = await storage.put(Buffer.from('hello ipfs!')) // Stored to IPFS
+
+storage.makeActive(Provider.SWARM)
+const swarmHash = await storage.put(Buffer.from('hello swarm!')) // Stored to Swarm
+
+console.log(storage.get(ipfsHash)) // Retrieves data from IPFS and prints 'hello ipfs!'
+console.log(storage.get(swarmHash)) // Retrieves data from Swarm and prints 'hello swarm!'
 ```
 
 ## Providers

@@ -51,7 +51,7 @@ export function isFile (obj: object): boolean {
 
   // TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
   // @ts-ignore
-  return Boolean(obj && obj[FILE_SYMBOL])
+  return Boolean(obj[FILE_SYMBOL])
 }
 
 /**
@@ -66,7 +66,7 @@ export function isDirectory (obj: object): boolean {
 
   // TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
   // @ts-ignore
-  return Boolean(obj && obj[DIRECTORY_SYMBOL])
+  return Boolean(obj[DIRECTORY_SYMBOL])
 }
 
 export function isTSDirectory<T> (data: object, genericTest: (entry: T) => boolean): data is Directory<T> {

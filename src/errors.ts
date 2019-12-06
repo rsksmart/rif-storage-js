@@ -22,3 +22,15 @@ export class ValueError extends RdsError {
     this.name = 'ValueError'
   }
 }
+
+/**
+ * Error related to Manager and its Providers
+ */
+export class ProviderError extends RdsError {
+  static code = 'RDS_PROVIDER_ERR'
+
+  constructor (message: string) {
+    super(message)
+    this.name = 'ProviderError'
+  }
+}

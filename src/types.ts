@@ -2,16 +2,17 @@ import { IpfsClient, CidAddress, ClientOptions } from 'ipfs-http-client'
 import { Bzz } from '@erebos/api-bzz-node'
 import { BzzConfig } from '@erebos/api-bzz-base'
 import { Readable } from 'stream'
+import { Manager } from './manager'
 
 export enum Provider {
-  LOCAL_STORAGE = 'local',
+  MANAGER = 'manager',
   IPFS = 'ipfs',
   SWARM = 'swarm',
 }
 
 export type Address = string
 
-export type Options = ClientOptions | BzzConfig
+export type Options = IpfsClient | ClientOptions | BzzConfig
 
 export interface DirectoryEntry<T> {
   data: T
@@ -24,7 +25,7 @@ export type Directory<T> = Record<string, DirectoryEntry<T>>
 export type DirectoryArrayEntry<T> = DirectoryEntry<T> & { path: string }
 export type DirectoryArray<T> = Array<DirectoryArrayEntry<T>>
 
-export type AllPutInputs =
+export type PutInputs =
   string
   | Buffer
   | Readable
@@ -57,6 +58,7 @@ export interface StorageProvider<Addr, GetOpts, PutOpts> {
  ****************** IPFS INTEGRATION *******************
  *******************************************************/
 
+// TODO: Add proper options definitions
 export interface IpfsStorageProvider
   extends StorageProvider<CidAddress, object, object> {
   readonly ipfs: IpfsClient
@@ -69,3 +71,5 @@ export interface IpfsStorageProvider
 export interface SwarmStorageProvider extends StorageProvider<Address, object, object> {
   readonly bzz: Bzz
 }
+
+export type AllProviders = IpfsStorageProvider | SwarmStorageProvider | Manager
