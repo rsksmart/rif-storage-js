@@ -34,19 +34,19 @@
 ### npm
 
 ```sh
-> npm install rif-storage
+> npm install @rsksmart/rif-storage
 ```
 
 ### Use in Node.js
 
 ```js
-var RifStorage = require('rif-storage')
+var RifStorage = require('@rsksmart/rif-storage')
 ```
 
 ### Use in a browser with browserify, webpack or any other bundler
 
 ```js
-var RifStorage = require('rif-storage')
+var RifStorage = require('@rsksmart/rif-storage')
 ```
 
 ### Use in a browser Using a script tag
@@ -54,9 +54,9 @@ var RifStorage = require('rif-storage')
 Loading this module through a script tag will make the `RifStorage` obj available in the global namespace.
 
 ```html
-<script src="https://unpkg.com/rif-storage/dist/index.min.js"></script>
+<script src="https://unpkg.com/@rsksmart/rif-storage/dist/index.min.js"></script>
 <!-- OR -->
-<script src="https://unpkg.com/rif-storage/dist/index.js"></script>
+<script src="https://unpkg.com/@rsksmart/rif-storage/dist/index.js"></script>
 ```
 
 ## Usage
@@ -64,7 +64,7 @@ Loading this module through a script tag will make the `RifStorage` obj availabl
 This is a client library, therefore you need to provide access to the provider's running node for specifics see [Providers](#providers).
 
 ```javascript
-import RifStorage, { Provider } from 'rif-storage'
+import RifStorage, { Provider } from '@rsksmart/rif-storage'
 
 // Connects to locally running node
 const storage = RifStorage(Provider.IPFS, { host: 'localhost', port: '5001', protocol: 'http' })
@@ -93,7 +93,7 @@ It has concept of active provider which is the one to which the data are `put()`
 When registering providers the first one will become the active one by default.
  
 ```javascript
-import { Manager, Provider } from 'rif-storage'
+import { Manager, Provider } from '@rsksmart/rif-storage'
 
 const storage = new Manager()
 
@@ -151,12 +151,12 @@ You can access the [Erebos]'s `api-bzz` instance using `.bzz` property of the `S
 
 Bellow is summary of the main APIs. [See full API documentation here](./docs/README.md)
 
-### [factory(type: Provider, options: object) -> IpfsStorageProvider | SwarmStorageProvider](./docs/modules/_index_.md) 
+### `factory(type: Provider, options: object) -> IpfsStorageProvider | SwarmStorageProvider` 
 
 > exposed as default export of the library
 
 ```javascript
-import RifStorage, {Provider} from 'rif-storage'
+import RifStorage, {Provider} from '@rsksmart/rif-storage'
 const provider = RifStorage(Provider.IPFS, options)
 ```
 
@@ -167,7 +167,7 @@ const provider = RifStorage(Provider.IPFS, options)
 Enum of supported providers.
 
 ```javascript
-import {Provider} from 'rif-storage'
+import {Provider} from '@rsksmart/rif-storage'
 Provider.IPFS
 ```
 
@@ -241,7 +241,7 @@ Returns:
 You can distinguish between these two using `isDirectory(obj)` or `isFile(obj)`.
 
 ```javascript
-import {isFile, isDirectory} from 'rif-storage'
+import {isFile, isDirectory} from '@rsksmart/rif-storage'
 
 const data = await provider.get('some directory hash')
 

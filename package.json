@@ -1,5 +1,5 @@
 {
-  "name": "rif-storage",
+  "name": "@rsksmart/rif-storage",
   "version": "0.1.0",
   "description": "Library integrating distributed storage projects",
   "keywords": [
