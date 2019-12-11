@@ -5,6 +5,13 @@ import { ClientOptions, IpfsClient } from 'ipfs-http-client'
 import { BzzConfig } from '@erebos/api-bzz-base'
 import { Manager } from './manager'
 
+/**
+ * Main entry point of the library that serves as a factory to create instances of StorageProvider
+ * for given provider.
+ *
+ * @param provider
+ * @param options
+ */
 function factory (provider: Provider, options: Options): IpfsStorageProvider | SwarmStorageProvider | Manager {
   if (!options) {
     throw new Error('You have to pass options!')

@@ -219,6 +219,7 @@ async function getReadable (this: IpfsStorageProvider, address: CidAddress, opti
 }
 
 /**
+ * Factory for supporting IPFS
  *
  * @param options
  * @constructor

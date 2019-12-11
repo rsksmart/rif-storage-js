@@ -17,16 +17,42 @@ import { detectAddress } from '../test/utils'
  * It allows registration of all supported providers and then easy putting/getting data with
  * the same interface as providers.
  *
+ * It has concept of active provider which is the one to which the data are `put()`.
+ * When registering providers the first one will become the active one by default.
+ *
  * For getting data it is decided based on provided address what Provider should be used. If
  * provider for given address is not given, then error is thrown.
  *
  * For putting data, there is concept of "active" provider, that the data are passed to.
  * The first provider that you register automatically becomes the active provider. You can
  * change that anytime using `makeActive()` method.
+ *
+ * @example
+ * ```javascript
+ * import { Manager, Provider } from 'rif-storage'
+
+ const storage = new Manager()
+
+ // The first added provider becomes also the active one
+ storage.addProvider(Provider.IPFS, { host: 'localhost', port: '5001', protocol: 'http' })
+ storage.addProvider(Provider.SWARM, { url: 'http://localhost:8500' })
+
+ const ipfsHash = await storage.put(Buffer.from('hello ipfs!')) // Stored to IPFS
+
+ storage.makeActive(Provider.SWARM)
+ const swarmHash = await storage.put(Buffer.from('hello swarm!')) // Stored to Swarm
+
+ console.log(storage.get(ipfsHash)) // Retrieves data from IPFS and prints 'hello ipfs!'
+ console.log(storage.get(swarmHash)) // Retrieves data from Swarm and prints 'hello swarm!'
+ ```
  */
 export class Manager implements StorageProvider<string, object, object> {
   private readonly providers: Partial<Record<Provider, AllProviders>>
   private active?: Provider
+
+  /**
+   * @hidden
+   */
   readonly type: Provider
 
   constructor () {
