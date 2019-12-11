@@ -1,6 +1,4 @@
 import { Readable } from 'stream'
-import { Provider } from '../src'
-import CID from 'cids'
 
 export function createReadable (input: string): Readable {
   const stream = new Readable()
@@ -23,18 +21,4 @@ export function streamToString (stream: Readable): Promise<string> {
       resolve(Buffer.concat(chunks).toString('utf8'))
     })
   })
-}
-
-export function detectAddress (address: string): Provider | false {
-  try {
-    // eslint-disable-next-line no-new
-    new CID(address)
-    return Provider.IPFS
-  } catch (e) {
-    if (address.length !== 64) {
-      return false
-    }
-
-    return Provider.SWARM
-  }
 }

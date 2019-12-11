@@ -10,7 +10,7 @@ import {
 import { Readable } from 'stream'
 import factory from './index'
 import { ProviderError, ValueError } from './errors'
-import { detectAddress } from '../test/utils'
+import { detectAddress } from './utils'
 
 /**
  * Utility class that supports easy usage of multiple providers in your applications.

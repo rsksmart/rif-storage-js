@@ -1,5 +1,6 @@
-import { Directory, DirectoryArray } from './types'
+import { Directory, DirectoryArray, Provider } from './types'
 import { Readable } from 'stream'
+import CID from 'cids'
 
 export const FILE_SYMBOL = Symbol.for('@rds-lib/file')
 export const DIRECTORY_SYMBOL = Symbol.for('@rds-lib/directory')
@@ -104,4 +105,18 @@ export function isReadable (entry: unknown): entry is Readable {
 
 export function isReadableOrBuffer (entry: unknown): entry is Readable | Buffer {
   return Buffer.isBuffer(entry) || isReadable(entry)
+}
+
+export function detectAddress (address: string): Provider | false {
+  try {
+    // eslint-disable-next-line no-new
+    new CID(address)
+    return Provider.IPFS
+  } catch (e) {
+    if (address.length !== 64) {
+      return false
+    }
+
+    return Provider.SWARM
+  }
 }

@@ -4,7 +4,6 @@ import chai from 'chai'
 import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
 import { Provider } from '../src'
-import { detectAddress } from './utils'
 
 // Do not reorder these statements - https://github.com/chaijs/chai/issues/1298
 chai.use(chaiAsPromised)
@@ -94,7 +93,7 @@ describe('utils', () => {
         '92672a471f4419b255d7cb0cf313474a6f58asdf56fb347c5ec644b630f': false
       }
 
-      Object.entries(data).forEach(([hash, result]) => expect(detectAddress(hash), hash).to.eql(result))
+      Object.entries(data).forEach(([hash, result]) => expect(utils.detectAddress(hash), hash).to.eql(result))
     })
   })
 })
