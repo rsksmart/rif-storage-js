@@ -21,7 +21,7 @@
     "lib",
     "dist"
   ],
-  "main": "src/index.ts",
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/rsksmart/rif-storage-js.git"
