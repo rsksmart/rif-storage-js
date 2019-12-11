@@ -118,6 +118,11 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: Regula
     data = Buffer.from(data)
   }
 
+  // Convert single element DirectoryArray
+  if (typeof data === 'object' && Array.isArray(data) && data.length === 1) {
+    data = data[0].data
+  }
+
   if (Buffer.isBuffer(data) || isReadable(data as Readable)) {
     log('uploading single file')
     return (await this.ipfs.add(data as Buffer | Readable, options))[0].hash

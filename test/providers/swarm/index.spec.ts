@@ -176,8 +176,58 @@ describe('Swarm provider', () => {
 
       expect(Object.keys(result)).to.include.members([
         'file',
-        'other-file'
+        'other-file',
+        'some/folder/other-file'
       ])
+    })
+
+    it('should store DirectoryArray with one entry as file as raw', async () => {
+      const file = (path: string): DirectoryArrayEntry<Readable> => {
+        return {
+          path,
+          data: createReadable('data'),
+          size: 4
+        }
+      }
+
+      const dir = [file('file')]
+
+      const hash = await provider.put(dir)
+      log(`uploaded file ${hash}`)
+
+      const result = await bzz.download(hash, { mode: 'raw' })
+      log(`downloaded file ${hash}`)
+
+      expect(await result.text()).to.equal('data')
+
+      const singleFile = await provider.get(hash)
+      expect(Buffer.isBuffer(singleFile)).to.be.true()
+      expect(singleFile.toString()).to.eql('data')
+    })
+
+    it('should store DirectoryArray with one entry as file content typed', async () => {
+      const file = (path: string): DirectoryArrayEntry<Readable> => {
+        return {
+          path,
+          data: createReadable('data'),
+          size: 4,
+          contentType: 'plain/text'
+        }
+      }
+
+      const dir = [file('file')]
+
+      const hash = await provider.put(dir)
+      log(`uploaded file ${hash}`)
+
+      const result = await bzz.download(hash)
+      log(`downloaded file ${hash}`)
+
+      expect(await result.text()).to.equal('data')
+
+      const singleFile = await provider.get(hash)
+      expect(Buffer.isBuffer(singleFile)).to.be.true()
+      expect(singleFile.toString()).to.eql('data')
     })
 
     it('should store directory with mixed styles nested directories', async () => {

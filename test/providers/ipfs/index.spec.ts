@@ -146,6 +146,24 @@ describe('IPFS provider', function () {
         `${rootCid}/some/folder/other-file`
       ])
     })
+
+    it('should store DirectoryArray with single element as file', async () => {
+      const file = (path: string): DirectoryArrayEntry<Readable> => {
+        return {
+          path,
+          data: createReadable('data'),
+          size: 4
+        }
+      }
+
+      const dir = [file('file')]
+
+      const rootCid = await provider.put(dir)
+
+      const result = await provider.get(rootCid)
+      expect(Buffer.isBuffer(result)).to.be.true()
+      expect(result.toString()).to.eql('data')
+    })
   })
 
   describe('.get()', () => {

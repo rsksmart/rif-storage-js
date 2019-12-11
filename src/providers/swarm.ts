@@ -86,6 +86,13 @@ function uploadStreamDirectory (client: Bzz, data: Directory<string | Readable |
 async function put (this: SwarmStorageProvider, data: PutInputs, options?: UploadOptions): Promise<any> {
   options = options || {}
 
+  // Convert single element DirectoryArray
+  if (typeof data === 'object' && Array.isArray(data) && data.length === 1) {
+    options.contentType = options.contentType || data[0].contentType
+    options.size = options.size || data[0].size
+    data = data[0].data
+  }
+
   if (Buffer.isBuffer(data) || typeof data === 'string') {
     log('uploading single file')
     return this.bzz.uploadFile(data, options)
