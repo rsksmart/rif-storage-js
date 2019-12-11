@@ -29,6 +29,7 @@
   "scripts": {
     "compile": "tasegir compile",
     "compile:watch": "tasegir compile -- --watch",
+    "docs": "typedoc --mode modules --excludeNotExported --readme none --excludePrivate  --tsconfig ./node_modules/tasegir/src/config/tsconfig.json --exclude 'src/providers/*,test/**/*' --out docs src",
     "types-check": "tasegir types-check",
     "exec": "tasegir run",
     "lint": "tasegir lint",
@@ -65,7 +66,9 @@
     "ipfsd-ctl": "^0.47.4",
     "merge-options": "^2.0.0",
     "sinon": "^7.5.0",
-    "tasegir": "^1.3.3"
+    "tasegir": "^1.3.3",
+    "typedoc": "^0.15.4",
+    "typedoc-plugin-markdown": "^2.2.14"
   },
   "engines": {
     "node": ">=10.0.0",

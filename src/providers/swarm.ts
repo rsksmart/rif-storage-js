@@ -1,3 +1,7 @@
+/**
+ * @ignore
+ */
+
 import {
   Address, PutInputs,
   Directory, DirectoryArray,
