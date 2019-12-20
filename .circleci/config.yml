@@ -14,7 +14,7 @@ jobs:
             - node-v1-
       - run:
           name: "Install deps"
-          command: npm install
+          command: npm ci
       - save_cache:
           paths:
             - ./node_modules
@@ -27,7 +27,7 @@ jobs:
             npx tasegir commitlint --circleci
       - run:
           name: "Dependency check"
-          command: npx tasegir dep-check
+          command: npx tasegir dep-check -- --unused --no-dev
       - run:
           name: "Code linting"
           command: npx tasegir lint
@@ -76,7 +76,7 @@ jobs:
             - node-v1-
       - run:
           name: "Install deps"
-          command: npm install
+          command: npm ci
       - run:
           name: install dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
@@ -112,7 +112,7 @@ jobs:
   #            DOCKERIZE_VERSION: v0.3.0
   #      - run:
   #          name: "Install deps"
-  #          command: npm install
+  #          command: npm ci
   #      - run:
   #          name: Wait for Swarm
   #          command: dockerize -wait tcp://localhost:8500 -timeout 2m
@@ -144,7 +144,7 @@ jobs:
           command: sudo apt-get install -y libgconf-2-4 libasound2 libxss1 xvfb gcc-multilib g++-multilib icnsutils graphicsmagick xz-utils libudev-dev libnss3 libgtk-3-0
       - run:
           name: "Install deps"
-          command: npm install
+          command: npm ci
       - run:
           name: Wait for Swarm
           command: dockerize -wait tcp://localhost:8500 -timeout 2m
