@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  sonarcloud: sonarsource/sonarcloud@1.0.1
+
 jobs:
   check:
     docker:
@@ -27,7 +30,7 @@ jobs:
             npx tasegir commitlint --circleci
       - run:
           name: "Dependency check"
-          command: npx tasegir dep-check -- --unused --no-dev
+          command: npx tasegir dep-check
       - run:
           name: "Code linting"
           command: npx tasegir lint
@@ -54,13 +57,10 @@ jobs:
       - run:
           name: Wait for Swarm
           command: dockerize -wait tcp://localhost:8500 -timeout 2m
-
       - run:
           name: "Node tests"
-          command: npm run test:node -- --bail
-      - run:
-          name: "Test coverage"
-          command: npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov
+          command: npx tasegir test --target node --reporter lcovonly -- --bail
+      - sonarcloud/scan
 
   chrome:
     docker:
@@ -87,9 +87,7 @@ jobs:
           command: dockerize -wait tcp://localhost:8500 -timeout 2m
       - run:
           name: "Browser tests"
-          # TODO: Waiting for release of Erebos fixing Web-worker integration
-          # command: npx tasegir test -t browser -t webworker
-          command: npx tasegir test -t browser
+          command: npx tasegir test -t browser -t webworker
 
     # TODO: Currently not used. Failing most probably because of CORS restrictions, which I did not managed to overcome. Firefox does not allow to disable this check and I have not managed to set Karma to support this.
     # Yet I am not 100% sure if it is really the problem.
@@ -118,9 +116,7 @@ jobs:
   #          command: dockerize -wait tcp://localhost:8500 -timeout 2m
   #      - run:
   #          name: "Browser tests"
-  #          # TODO: Waiting for release of Erebos fixing Web-worker integration
-  #          #command: npx tasegir test -t browser -t webworker -- --browsers FirefoxHeadless
-  #          command: npx tasegir test -t browser -- --browsers FirefoxHeadless
+  #          command: npx tasegir test -t browser -t webworker -- --browsers FirefoxHeadless
 
   electron-main:
     docker:
