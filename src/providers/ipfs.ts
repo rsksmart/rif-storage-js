@@ -112,7 +112,7 @@ function mapDataToIpfs<T> (data: Directory<T>): Array<IpfsObject<T>> {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function put (this: IpfsStorageProvider, data: PutInputs, options?: RegularFiles.AddOptions): Promise<any> {
-  options = Object.assign({ cidVersion: 1 }, options)
+  options = options || {}
 
   if (typeof data === 'string') {
     data = Buffer.from(data)
