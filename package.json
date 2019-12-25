@@ -44,7 +44,7 @@
     "@erebos/api-bzz-node": "^0.11.0",
     "cids": "^0.7.1",
     "debug": "^4.1.0",
-    "ipfs-http-client": "^40.0.1",
+    "ipfs-http-client": "^40.1.0",
     "readable-stream": "^3.4.0",
     "tar-stream": "^2.1.0"
   },
