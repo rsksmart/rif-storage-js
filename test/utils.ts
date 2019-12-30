@@ -10,7 +10,7 @@ export function createReadable (input: string): Readable {
   return stream
 }
 
-export function streamToString (stream: Readable): Promise<string> {
+export function streamToBuffer (stream: Readable): Promise<Buffer> {
   const chunks: Array<Buffer> = []
   return new Promise((resolve, reject) => {
     stream.on('data', chunk => {
@@ -18,9 +18,13 @@ export function streamToString (stream: Readable): Promise<string> {
     })
     stream.on('error', reject)
     stream.on('end', () => {
-      resolve(Buffer.concat(chunks).toString('utf8'))
+      resolve(Buffer.concat(chunks))
     })
   })
+}
+
+export async function streamToString (stream: Readable): Promise<string> {
+  return (await streamToBuffer(stream)).toString('utf8')
 }
 
 /**
