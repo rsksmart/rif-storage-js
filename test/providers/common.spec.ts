@@ -1,13 +1,14 @@
 import { ipfs as ipfsProvider, swarm as swarmProvider } from '../../src'
 import createIpfs from './ipfs/utils'
-import { IpfsStorageProvider, SwarmStorageProvider } from '../../src/types'
+import { Directory, Entry, IpfsStorageProvider, SwarmStorageProvider } from '../../src/types'
 import { ValueError } from '../../src/errors'
 
 import chai from 'chai'
 import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
-import { randomBuffer } from '../utils'
+import { randomBuffer, streamToBuffer, streamToString } from '../utils'
 import * as utils from '../../src/utils'
+import { Readable } from 'stream'
 
 // Do not reorder these statements - https://github.com/chaijs/chai/issues/1298
 chai.use(chaiAsPromised)
@@ -88,15 +89,54 @@ describe('Common providers tests', () => {
           return Promise.all(promises)
         })
       })
-      describe('integration', () => {
-        it('should correctly handle binary data', async function () {
-          const data = randomBuffer(100)
+      describe('integration tests', () => {
+        describe('should correctly handle binary data', async function () {
+          const data = randomBuffer(20)
 
-          const hash = await provider.put(data) as string
-          const featchedData = await provider.get(hash)
+          it('Buffer - file', async function () {
+            const hash = await provider.put(data) as string
+            const fetched = await provider.get(hash) as Entry<Buffer>
 
-          expect(utils.isFile(featchedData)).to.be.true()
-          expect(data.equals(featchedData as Buffer)).to.be.true()
+            expect(utils.isFile(fetched)).to.be.true()
+            expect(data.equals(fetched.data as Buffer)).to.be.true()
+          })
+
+          it('Buffer - directory', async function () {
+            const dirHash = await provider.put({ file: { data }, other: { data } } as Directory<Buffer>) as string
+            const fetched = await provider.get(dirHash) as Directory<Buffer>
+
+            expect(utils.isDirectory(fetched)).to.be.true()
+            expect(data.equals(fetched.file.data)).to.be.true()
+          })
+
+          it('Stream - file', async function () {
+            const hash = await provider.put(data) as string
+            const readable = await provider.getReadable(hash)
+
+            let count = 0
+            for await (const streamElement of readable) {
+              expect(streamElement).to.be.a('object')
+              const result = await streamToBuffer(streamElement.data)
+              expect(data.equals(result)).to.be.true()
+              count++
+            }
+            expect(count).eql(1)
+          })
+
+          it('Stream - directory', async function () {
+            const dirHash = await provider.put({ file: { data } } as Directory<Buffer>) as string
+            const readable = await provider.getReadable(dirHash)
+
+            let count = 0
+            for await (const streamElement of readable) {
+              expect(streamElement).to.be.a('object')
+              const result = await streamToBuffer(streamElement.data)
+              expect(data.equals(result)).to.be.true()
+              expect(streamElement.path).to.equal('file')
+              count++
+            }
+            expect(count).eql(1)
+          })
         })
       })
     })
