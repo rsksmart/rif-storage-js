@@ -22,3 +22,20 @@ export function streamToString (stream: Readable): Promise<string> {
     })
   })
 }
+
+/**
+ * Utility function for generating random Buffer
+ * !!! IT IS NOT CRYPTO SAFE !!!
+ * For that use `crypto.randomBytes()`
+ *
+ * @param length
+ */
+export function randomBuffer (length: number): Buffer {
+  const buf = Buffer.alloc(length)
+
+  for (let i = 0; i < length; ++i) {
+    buf[i] = (Math.random() * 0xFF) << 0
+  }
+
+  return buf
+}

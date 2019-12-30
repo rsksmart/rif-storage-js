@@ -6,6 +6,8 @@ import { ValueError } from '../../src/errors'
 import chai from 'chai'
 import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
+import { randomBuffer } from '../utils'
+import * as utils from '../../src/utils'
 
 // Do not reorder these statements - https://github.com/chaijs/chai/issues/1298
 chai.use(chaiAsPromised)
@@ -84,6 +86,17 @@ describe('Common providers tests', () => {
           // @ts-ignore
           const promises = inputs.map(entry => expect(provider.getReadable(entry)).to.be.eventually.rejectedWith(ValueError))
           return Promise.all(promises)
+        })
+      })
+      describe('integration', () => {
+        it('should correctly handle binary data', async function () {
+          const data = randomBuffer(100)
+
+          const hash = await provider.put(data) as string
+          const featchedData = await provider.get(hash)
+
+          expect(utils.isFile(featchedData)).to.be.true()
+          expect(data.equals(featchedData as Buffer)).to.be.true()
         })
       })
     })

@@ -158,7 +158,7 @@ async function get (this: SwarmStorageProvider, address: Address, options?: Uplo
     if (result.entries.length === 1) {
       log(`fetching single file from ${address}`)
       const file = await this.bzz.download(address, options)
-      return markFile(Buffer.from(await file.text()))
+      return markFile(Buffer.from(await file.arrayBuffer()))
     }
   } catch (e) {
     // Internal Server error is returned by Swarm when the address is not Manifest
@@ -168,7 +168,7 @@ async function get (this: SwarmStorageProvider, address: Address, options?: Uplo
 
     log(`fetching single raw file from ${address}`)
     const file = await this.bzz.download(address, Object.assign({ mode: 'raw' }, options))
-    return markFile(Buffer.from(await file.text()))
+    return markFile(Buffer.from(await file.arrayBuffer()))
   }
 
   log(`fetching directory from ${address}`)
