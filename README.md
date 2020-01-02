@@ -1,6 +1,6 @@
 # RIF Storage.js
 
-[![CircleCI](https://flat.badgen.net/circleci/github/rsksmart/rif-storage-js)](https://circleci.com/gh/rsksmart/rif-storage-js/)
+[![CircleCI](https://flat.badgen.net/circleci/github/rsksmart/rif-storage-js/master)](https://circleci.com/gh/rsksmart/rif-storage-js/)
 [![Dependency Status](https://david-dm.org/rsksmart/rif-storage-js.svg?style=flat-square)](https://david-dm.org/rsksmart/rif-storage-js)
 [![](https://img.shields.io/badge/made%20by-IOVLabs-blue.svg?style=flat-square)](http://iovlabs.org)
 [![](https://img.shields.io/badge/project-RIF%20Storage-blue.svg?style=flat-square)](https://www.rifos.org/)
