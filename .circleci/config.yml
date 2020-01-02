@@ -34,7 +34,6 @@ jobs:
       - run:
           name: "Code linting"
           command: npx tasegir lint
-
   node-tests:
     parameters:
       version:
