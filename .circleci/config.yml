@@ -180,11 +180,11 @@ workflows:
   version: 2
   test:
     jobs:
-      - check:
-          context: SonarCloud
+      - check
       - node-tests:
           version: '10'
           name: node-10
+          context: SonarCloud
           requires:
             - check
       - node-tests:
