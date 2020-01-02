@@ -34,7 +34,7 @@ jobs:
       - run:
           name: "Code linting"
           command: npx tasegir lint
-          
+
   node-tests:
     parameters:
       version:
@@ -180,7 +180,8 @@ workflows:
   version: 2
   test:
     jobs:
-      - check
+      - check:
+          context: SonarCloud
       - node-tests:
           version: '10'
           name: node-10
