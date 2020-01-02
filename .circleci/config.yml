@@ -37,7 +37,7 @@ jobs:
         type: string
     docker:
       - image: circleci/node:<< parameters.version >>
-      - image: auhau/swarm_test:0.5.2
+      - image: auhau/swarm_test:0.5.4
     steps:
       - checkout
       - restore_cache:
@@ -65,7 +65,7 @@ jobs:
   chrome:
     docker:
       - image: circleci/node:12-browsers
-      - image: auhau/swarm_test:0.5.2
+      - image: auhau/swarm_test:0.5.4
     steps:
       - checkout
       - restore_cache:
@@ -125,7 +125,7 @@ jobs:
   electron-main:
     docker:
       - image: circleci/node:12-browsers
-      - image: auhau/swarm_test:0.5.2
+      - image: auhau/swarm_test:0.5.4
     steps:
       - checkout
       - restore_cache:
@@ -155,7 +155,7 @@ jobs:
   electron-renderer:
     docker:
       - image: circleci/node:12-browsers
-      - image: auhau/swarm_test:0.5.2
+      - image: auhau/swarm_test:0.5.4
     steps:
       - checkout
       - restore_cache:
