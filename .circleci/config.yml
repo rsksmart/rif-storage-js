@@ -190,20 +190,24 @@ workflows:
       - node-tests:
           version: '12'
           name: node-12
+          context: SonarCloud
           requires:
             - check
       - node-tests:
           version: '13'
           name: node-13
+          context: SonarCloud
           requires:
             - check
       - chrome:
+          context: SonarCloud
           requires:
             - check
       #- firefox:
       #    requires:
       #      - check
       - electron-main:
+          context: SonarCloud
           requires:
             - check
 #      - electron-renderer:
