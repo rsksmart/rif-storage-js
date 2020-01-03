@@ -1,5 +1,5 @@
 import { swarm as swarmProvider } from '../../../src'
-import { DirectoryArrayEntry, SwarmStorageProvider } from '../../../src/types'
+import { Directory, Entry, SwarmStorageProvider } from '../../../src/types'
 import { Bzz } from '@erebos/api-bzz-node'
 import * as utils from '../../../src/utils'
 import debug from 'debug'
@@ -11,6 +11,7 @@ import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
 
 const log = debug('rds:test:swarm')
+const AssertionError = chai.AssertionError
 
 // Do not reorder these statements - https://github.com/chaijs/chai/issues/1298
 chai.use(chaiAsPromised)
@@ -42,6 +43,29 @@ describe('Swarm provider', () => {
       log(`uploaded file ${hash}`)
 
       const result = await bzz.download(hash, { mode: 'raw' })
+      log(`downloaded file ${hash}`)
+
+      expect(await result.text()).to.equal('hello world')
+    })
+
+    it('should store file with filename', async () => {
+      const hash = await provider.put(Buffer.from('hello world'), { filename: 'some_file_name.pdf' })
+      log(`uploaded file ${hash}`)
+      const listResult = await bzz.list(hash)
+
+      if (!listResult || !listResult.entries) {
+        throw new AssertionError('Entries are wrong!')
+      }
+
+      expect(listResult.entries).to.be.an('Array')
+      expect(listResult.entries.length).to.eq(1)
+      expect(listResult.entries[0]).to.include({
+        path: 'some_file_name.pdf',
+        contentType: 'application/pdf',
+        size: 11
+      })
+
+      const result = await bzz.download(listResult.entries[0].hash, { mode: 'raw' })
       log(`downloaded file ${hash}`)
 
       expect(await result.text()).to.equal('hello world')
@@ -150,7 +174,7 @@ describe('Swarm provider', () => {
     })
 
     it('should store directory in DirectoryArray format with readable', async () => {
-      const file = (path: string): DirectoryArrayEntry<Readable> => {
+      const file = (path: string): Entry<Readable> => {
         return {
           path,
           data: createReadable('data'),
@@ -181,8 +205,8 @@ describe('Swarm provider', () => {
       ])
     })
 
-    it('should store DirectoryArray with one entry as file as raw', async () => {
-      const file = (path: string): DirectoryArrayEntry<Readable> => {
+    it('should store DirectoryArray with one entry as directory', async () => {
+      const file = (path: string): Entry<Readable> => {
         return {
           path,
           data: createReadable('data'),
@@ -190,44 +214,36 @@ describe('Swarm provider', () => {
         }
       }
 
-      const dir = [file('file')]
+      const dir = [file('file.pdf')]
 
       const hash = await provider.put(dir)
       log(`uploaded file ${hash}`)
 
-      const result = await bzz.download(hash, { mode: 'raw' })
-      log(`downloaded file ${hash}`)
+      const listResult = await bzz.list(hash)
 
-      expect(await result.text()).to.equal('data')
-
-      const singleFile = await provider.get(hash)
-      expect(Buffer.isBuffer(singleFile)).to.be.true()
-      expect(singleFile.toString()).to.eql('data')
-    })
-
-    it('should store DirectoryArray with one entry as file content typed', async () => {
-      const file = (path: string): DirectoryArrayEntry<Readable> => {
-        return {
-          path,
-          data: createReadable('data'),
-          size: 4,
-          contentType: 'plain/text'
-        }
+      if (!listResult || !listResult.entries) {
+        throw new AssertionError('Entries are wrong!')
       }
 
-      const dir = [file('file')]
+      expect(listResult.entries).to.be.an('Array')
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      expect(listResult.entries.length).to.eq(1)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      expect(listResult.entries[0]).to.include({
+        path: 'file.pdf',
+        contentType: 'application/pdf',
+        size: 4
+      })
 
-      const hash = await provider.put(dir)
-      log(`uploaded file ${hash}`)
-
-      const result = await bzz.download(hash)
+      const result = await bzz.download(listResult.entries[0].hash, { mode: 'raw' })
       log(`downloaded file ${hash}`)
 
       expect(await result.text()).to.equal('data')
 
-      const singleFile = await provider.get(hash)
-      expect(Buffer.isBuffer(singleFile)).to.be.true()
-      expect(singleFile.toString()).to.eql('data')
+      const singleFileDirectory = await provider.get(hash) as Directory<Buffer>
+      expect(utils.isDirectory(singleFileDirectory)).to.be.true()
+      expect(singleFileDirectory).to.have.all.keys(['file.pdf', utils.DIRECTORY_SYMBOL])
+      expect(singleFileDirectory['file.pdf'].data.toString()).to.eql('data')
     })
 
     it('should store directory with mixed styles nested directories', async () => {
@@ -266,12 +282,16 @@ describe('Swarm provider', () => {
       expect(fetched.toString()).to.equal('hello world')
     })
 
-    it('should get content-typed file', async () => {
-      const hash = (await bzz.uploadFile(Buffer.from('hello world'), { contentType: 'plain/text' }))
+    it('should get named file as directory', async () => {
+      const hash = await provider.put(Buffer.from('hello world'), {
+        filename: 'some_file_name.pdf',
+        contentType: 'plain/text'
+      })
 
-      const fetched = await provider.get(hash)
-      expect(utils.isFile(fetched)).to.be.true()
-      expect(fetched.toString()).to.equal('hello world')
+      const fetched = await provider.get(hash) as Directory<Buffer>
+      expect(utils.isDirectory(fetched)).to.be.true()
+      expect(fetched).to.have.all.keys(['some_file_name.pdf', utils.DIRECTORY_SYMBOL])
+      expect(fetched['some_file_name.pdf'].data.toString()).to.equal('hello world')
     })
 
     it.skip('should get readable file', async () => {
@@ -329,6 +349,34 @@ describe('Swarm provider', () => {
         [
           'file',
           'other-file',
+          'folder/and/some/file',
+          utils.DIRECTORY_SYMBOL
+        ]
+      )
+
+      Object.values(fetched).forEach(file => expect(file).to.eql({
+        size: 9,
+        data: Buffer.from('some-data')
+      }))
+    })
+
+    it('should get directory with one entry but common prefixes', async () => {
+      const file = { data: Buffer.from('some-data') }
+
+      const dir = {
+        file: file,
+        'folder/and/some/other-file': file,
+        'folder/and/some/file': file
+      }
+      const result = await bzz.uploadDirectory(dir)
+
+      const fetched = await provider.get(result)
+      expect(utils.isDirectory(fetched)).to.be.true()
+
+      expect(fetched).to.have.all.keys(
+        [
+          'file',
+          'folder/and/some/other-file',
           'folder/and/some/file',
           utils.DIRECTORY_SYMBOL
         ]

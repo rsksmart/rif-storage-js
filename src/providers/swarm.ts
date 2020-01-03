@@ -1,7 +1,3 @@
-/**
- * @ignore
- */
-
 import {
   Address, PutInputs,
   Directory, DirectoryArray,
@@ -23,7 +19,7 @@ function isBzz (client: BzzConfig | Bzz): client is Bzz {
   return typeof client.download === 'function' && typeof client.downloadDirectoryData === 'function'
 }
 
-function mapDirectoryArrayToArray<T> (data: DirectoryArray<T>): Directory<T> {
+function mapDirectoryArrayToDirectory<T> (data: DirectoryArray<T>): Directory<T> {
   return data.reduce((previousValue: Directory<T>, currentValue) => {
     if (isReadable(currentValue.data) && !currentValue.size && currentValue.size !== 0) {
       throw new ValueError(`Missing "size" that is required for Readable streams (path: ${currentValue.path})`)
@@ -83,32 +79,59 @@ function uploadStreamDirectory (client: Bzz, data: Directory<string | Readable |
  * @param options
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,require-await
-async function put (this: SwarmStorageProvider, data: PutInputs, options?: UploadOptions): Promise<any> {
+async function put (this: SwarmStorageProvider, data: PutInputs, options?: UploadOptions & { filename?: string }): Promise<any> {
   options = options || {}
 
+  if (typeof data === 'string') {
+    data = Buffer.from(data)
+  }
+
   // Convert single element DirectoryArray
-  if (typeof data === 'object' && Array.isArray(data) && data.length === 1) {
-    options.contentType = options.contentType || data[0].contentType
-    options.size = options.size || data[0].size
-    data = data[0].data
+  if (Array.isArray(data) && data.length === 1) {
+    const el = data[0]
+    options.contentType = options.contentType || el.contentType
+    options.size = options.size || el.size
+    options.filename = options.filename || el.path
+    data = el.data
   }
 
-  if (Buffer.isBuffer(data) || typeof data === 'string') {
-    log('uploading single file')
-    return this.bzz.uploadFile(data, options)
-  }
-
-  if (isReadable(data)) {
-    if (!options.size) {
+  if (Buffer.isBuffer(data) || isReadable(data)) {
+    if (isReadable(data) && !options.size) {
       throw new ValueError('Missing "size" that is required for Readable streams')
     }
 
-    return this.bzz.uploadFile(data, options)
+    if (options.filename) {
+      data = [
+        {
+          data: data as Buffer | Readable,
+          path: options.filename,
+          size: options.size,
+          contentType: options.contentType
+        }
+      ]
+
+      options.defaultPath = options.filename
+      delete options.filename
+      delete options.size
+      delete options.contentType
+    } else {
+      log('uploading single buffer file')
+
+      return this.bzz.uploadFile(data, options)
+    }
   }
 
   log('uploading directory')
 
-  if ((typeof data !== 'object' && !Array.isArray(data)) || data === null) {
+  if (options.filename) {
+    throw new ValueError('You are uploading directory, yet you specified filename that is not applicable here!')
+  }
+
+  if (options.size) {
+    throw new ValueError('You are uploading directory, yet you specified size that is not applicable here!')
+  }
+
+  if ((typeof data !== 'object' && !Array.isArray(data)) || data === null || data === undefined) {
     throw new TypeError('data have to be string, Readable, Buffer, DirectoryArray or Directory object!')
   }
 
@@ -129,10 +152,10 @@ async function put (this: SwarmStorageProvider, data: PutInputs, options?: Uploa
     })
     return uploadStreamDirectory(this.bzz, data)
   } else if (isTSDirectoryArray(data, isReadableOrBuffer)) {
-    const mappedData = mapDirectoryArrayToArray(data)
+    const mappedData = mapDirectoryArrayToDirectory(data)
     return uploadStreamDirectory(this.bzz, mappedData)
   } else {
-    throw new ValueError('Data has to be Readable or Directory<Readable> or DirectoryArray<Readable>')
+    throw new ValueError('Data has to be string, Buffer, Readable, Directory<Readable> or DirectoryArray<Readable>')
   }
 }
 
@@ -142,8 +165,7 @@ async function put (this: SwarmStorageProvider, data: PutInputs, options?: Uploa
  * @param address
  * @param options
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function get (this: SwarmStorageProvider, address: Address, options?: UploadOptions): Promise<any> {
+async function get (this: SwarmStorageProvider, address: Address, options?: UploadOptions): Promise<Directory<Buffer> | Buffer> {
   if (typeof address !== 'string') {
     throw new ValueError(`Address ${address} is not a string!`)
   }
@@ -151,14 +173,8 @@ async function get (this: SwarmStorageProvider, address: Address, options?: Uplo
   try {
     const result = await this.bzz.list(address)
 
-    if (!result.entries) {
+    if (!result.entries && !result.common_prefixes) {
       throw new ValueError(`Address ${address} does not contain any files/folders!`)
-    }
-
-    if (result.entries.length === 1) {
-      log(`fetching single file from ${address}`)
-      const file = await this.bzz.download(address, options)
-      return markFile(Buffer.from(await file.arrayBuffer()))
     }
   } catch (e) {
     // Internal Server error is returned by Swarm when the address is not Manifest

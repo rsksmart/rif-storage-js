@@ -1,7 +1,7 @@
 import { ipfs as ipfsProvider } from '../../../src'
 import * as utils from '../../../src/utils'
 import { IpfsClient } from 'ipfs-http-client'
-import { DirectoryArrayEntry, IpfsStorageProvider } from '../../../src/types'
+import { Directory, Entry, IpfsStorageProvider } from '../../../src/types'
 import createIpfs from './utils'
 import { Readable } from 'stream'
 
@@ -42,6 +42,19 @@ describe('IPFS provider', function () {
 
       const fetchedFromIpfs = result[0]
       expect(fetchedFromIpfs.path).to.equal(cid)
+      expect(fetchedFromIpfs.content && fetchedFromIpfs.content.toString()).to.equal('hello world')
+    })
+
+    it('should store file with filename', async () => {
+      const cid = await provider.put(Buffer.from('hello world'), { filename: 'some_file.pdf' })
+
+      const result = await ipfs.get(cid)
+      expect(result.length).to.eq(2)
+
+      expect(result[0].path).to.equal(cid)
+
+      const fetchedFromIpfs = result[1]
+      expect(fetchedFromIpfs.path).to.equal(`${cid}/some_file.pdf`)
       expect(fetchedFromIpfs.content && fetchedFromIpfs.content.toString()).to.equal('hello world')
     })
 
@@ -114,7 +127,7 @@ describe('IPFS provider', function () {
     })
 
     it('should store directory in DirectoryArray format with Readable', async () => {
-      const file = (path: string): DirectoryArrayEntry<Readable> => {
+      const file = (path: string): Entry<Readable> => {
         return {
           path,
           data: createReadable('data'),
@@ -146,24 +159,6 @@ describe('IPFS provider', function () {
         `${rootCid}/some/folder/other-file`
       ])
     })
-
-    it('should store DirectoryArray with single element as file', async () => {
-      const file = (path: string): DirectoryArrayEntry<Readable> => {
-        return {
-          path,
-          data: createReadable('data'),
-          size: 4
-        }
-      }
-
-      const dir = [file('file')]
-
-      const rootCid = await provider.put(dir)
-
-      const result = await provider.get(rootCid)
-      expect(Buffer.isBuffer(result)).to.be.true()
-      expect(result.toString()).to.eql('data')
-    })
   })
 
   describe('.get()', () => {
@@ -173,6 +168,15 @@ describe('IPFS provider', function () {
       const fetchedFromIpfs = await provider.get(cid)
       expect(utils.isFile(fetchedFromIpfs)).to.be.true()
       expect(fetchedFromIpfs.toString()).to.equal('hello world')
+    })
+
+    it('should get named file as directory', async () => {
+      const cid = await provider.put(Buffer.from('hello world'), { filename: 'some_file.pdf' })
+
+      const fetchedFromIpfs = await provider.get(cid) as Directory<Buffer>
+      expect(utils.isDirectory(fetchedFromIpfs), 'isDirectory fail').to.be.true()
+      expect(fetchedFromIpfs).to.have.all.keys(['some_file.pdf', utils.DIRECTORY_SYMBOL])
+      expect(fetchedFromIpfs['some_file.pdf'].data.toString()).to.equal('hello world')
     })
 
     it('should get readable file', async () => {

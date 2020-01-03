@@ -15,7 +15,7 @@ export enum Provider {
 
 export type Address = string
 
-export type Options = IpfsClient | ClientOptions | BzzConfig
+export type ProviderOptions = IpfsClient | ClientOptions | BzzConfig
 
 /**
  * Object represents a file and some of its metadata in [[Directory]] object.
@@ -50,12 +50,12 @@ export type Directory<T> = Record<string, DirectoryEntry<T>>
  *
  * @see DirectoryEntry
  */
-export type DirectoryArrayEntry<T> = DirectoryEntry<T> & { path: string }
+export type Entry<T> = DirectoryEntry<T> & { path: string }
 
 /**
  * Alternative data structure for representing directories. Used mainly together with streaming.
  */
-export type DirectoryArray<T> = Array<DirectoryArrayEntry<T>>
+export type DirectoryArray<T> = Array<Entry<T>>
 
 export type PutInputs =
   string
@@ -65,19 +65,30 @@ export type PutInputs =
   | DirectoryArray<Buffer | Readable>
 
 /**
+ * Common options for all providers for the .put() method.
+ */
+export interface PutOptions {
+  filename?: string
+}
+
+/**
  * Generic interface that every provider has to implement.
  */
-export interface StorageProvider<Addr, GetOpts, PutOpts> {
+export interface StorageProvider<Addr, GetOpts, PutOpts extends PutOptions> {
   readonly type: Provider
 
   /**
    * Retrieves data from provider's network.
    *
-   * You can distinguish between returned objects using `isDirectory(obj)` or `isFile(obj)`.
+   * You can distinguish between returned objects using `isDirectory(obj)` or `isFile(obj)` utility functions.
+   *
+   * Addresses that point to single files are handled in two ways.
+   *  - if address contains raw data then Buffer is returned
+   *  - if address contains file with metadata (content-type, filename) then it is returned as single unit [[Directory]]
    *
    * @param address string hash or CID
    * @param options options passed to either IPFS's `get()` or Erebos's `download()` functions
-   * @return `Buffer` if the address was pointing to single file. [[Directory]] if the address was pointing to directory
+   * @return Buffer object if the address was pointing to raw data. [[Directory]] otherwise.
    */
   get (address: Addr, options?: GetOpts): Promise<Directory<Buffer> | Buffer>
 
@@ -86,12 +97,15 @@ export interface StorageProvider<Addr, GetOpts, PutOpts> {
    *
    * @param address string hash or CID
    * @param options options passed to either IPFS's `get()` or Erebos's `download()` functions
-   * @return `Readable` in object mode that yields [[DirectoryArrayEntry]] objects with `Readable` as `data`. The `data` has to be fully processed before moving to next entry.
+   * @return `Readable` in object mode that yields [[Entry]] objects with `Readable` as `data`. The `data` has to be fully processed before moving to next entry.
    */
   getReadable (address: Addr, options?: GetOpts): Promise<Readable>
 
   /**
    * Stores data on provider's network
+   *
+   * If to the data are given some metadata (content-type or filename), then the original data are wrapped in directory
+   * in order to persist these metadata.
    *
    * @param data
    * @param options

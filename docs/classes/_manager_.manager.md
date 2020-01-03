@@ -1,4 +1,4 @@
-[rif-storage](../README.md) › ["manager"](../modules/_manager_.md) › [Manager](_manager_.manager.md)
+[@rsksmart/rif-storage](../README.md) › ["manager"](../modules/_manager_.md) › [Manager](_manager_.manager.md)
 
 # Class: Manager
 
@@ -10,7 +10,7 @@ It has concept of active provider which is the one to which the data are `put()`
 When registering providers the first one will become the active one by default.
 
 For getting data it is decided based on provided address what Provider should be used. If
-provider for given address is not given, then error is thrown.
+provider for given address is not registered, then error is thrown.
 
 For putting data, there is concept of "active" provider, that the data are passed to.
 The first provider that you register automatically becomes the active provider. You can
@@ -31,8 +31,8 @@ const ipfsHash = await storage.put(Buffer.from('hello ipfs!')) // Stored to IPFS
 storage.makeActive(Provider.SWARM)
 const swarmHash = await storage.put(Buffer.from('hello swarm!')) // Stored to Swarm
 
-console.log(storage.get(ipfsHash)) // Retrieves data from IPFS and prints 'hello ipfs!'
-console.log(storage.get(swarmHash)) // Retrieves data from Swarm and prints 'hello swarm!'
+console.log(storage.get(ipfsHash).toString()) // Retrieves data from IPFS and prints 'hello ipfs!'
+console.log(storage.get(swarmHash).toString()) // Retrieves data from Swarm and prints 'hello swarm!'
 ```
 
 ## Hierarchy
@@ -67,7 +67,7 @@ console.log(storage.get(swarmHash)) // Retrieves data from Swarm and prints 'hel
 
 \+ **new Manager**(): *[Manager](_manager_.manager.md)*
 
-*Defined in [src/manager.ts:56](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/manager.ts#L56)*
+*Defined in [src/manager.ts:56](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/manager.ts#L56)*
 
 **Returns:** *[Manager](_manager_.manager.md)*
 
@@ -77,7 +77,7 @@ console.log(storage.get(swarmHash)) // Retrieves data from Swarm and prints 'hel
 
 • **get activeProvider**(): *[AllProviders](../modules/_types_.md#allproviders) | undefined*
 
-*Defined in [src/manager.ts:66](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/manager.ts#L66)*
+*Defined in [src/manager.ts:66](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/manager.ts#L66)*
 
 Returns the active provider
 
@@ -87,9 +87,9 @@ Returns the active provider
 
 ###  addProvider
 
-▸ **addProvider**(`type`: [Provider](../enums/_types_.provider.md), `options`: [Options](../modules/_types_.md#options)): *void*
+▸ **addProvider**(`type`: [Provider](../enums/_types_.provider.md), `options`: [ProviderOptions](../modules/_types_.md#provideroptions)): *void*
 
-*Defined in [src/manager.ts:79](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/manager.ts#L79)*
+*Defined in [src/manager.ts:79](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/manager.ts#L79)*
 
 Register new provider to be used by the Manager
 
@@ -102,7 +102,7 @@ Register new provider to be used by the Manager
 Name | Type | Description |
 ------ | ------ | ------ |
 `type` | [Provider](../enums/_types_.provider.md) | enum value |
-`options` | [Options](../modules/_types_.md#options) | - |
+`options` | [ProviderOptions](../modules/_types_.md#provideroptions) | - |
 
 **Returns:** *void*
 
@@ -112,12 +112,12 @@ ___
 
 ▸ **get**(`address`: string, `options?`: undefined | object): *Promise‹[Directory](../modules/_types_.md#directory)‹Buffer› | Buffer›*
 
-*Defined in [src/manager.ts:139](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/manager.ts#L139)*
+*Defined in [src/manager.ts:140](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/manager.ts#L140)*
 
 Retrieves data from provider.
 
 It detects which provider to use based on the format of provided address. If the detected
-provider is not registered then exception is raised
+provider is not registered then exception is raised.
 
 **`throws`** {ProviderError} when provider is not registered for given type of address
 
@@ -140,7 +140,7 @@ ___
 
 ▸ **getReadable**(`address`: string, `options?`: undefined | object): *Promise‹Readable›*
 
-*Defined in [src/manager.ts:155](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/manager.ts#L155)*
+*Defined in [src/manager.ts:156](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/manager.ts#L156)*
 
 Retrieves data from provider.
 
@@ -168,7 +168,7 @@ ___
 
 ▸ **makeActive**(`name`: [Provider](../enums/_types_.provider.md)): *void*
 
-*Defined in [src/manager.ts:98](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/manager.ts#L98)*
+*Defined in [src/manager.ts:98](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/manager.ts#L98)*
 
 Specify active provider
 
@@ -188,7 +188,7 @@ ___
 
 ▸ **put**(`data`: string | Buffer | Readable, `options?`: undefined | object): *Promise‹string›*
 
-*Defined in [src/manager.ts:167](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/manager.ts#L167)*
+*Defined in [src/manager.ts:168](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/manager.ts#L168)*
 
 Puts data to provider.
 
@@ -205,15 +205,15 @@ Name | Type |
 
 **Returns:** *Promise‹string›*
 
-▸ **put**(`data`: [Directory](../modules/_types_.md#directory)‹string | Buffer | Readable› | Array‹[DirectoryArrayEntry](../modules/_types_.md#directoryarrayentry)‹Buffer | Readable››, `options?`: undefined | object): *Promise‹string›*
+▸ **put**(`data`: [Directory](../modules/_types_.md#directory)‹string | Buffer | Readable› | Array‹[Entry](../modules/_types_.md#entry)‹Buffer | Readable››, `options?`: undefined | object): *Promise‹string›*
 
-*Defined in [src/manager.ts:168](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/manager.ts#L168)*
+*Defined in [src/manager.ts:169](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/manager.ts#L169)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`data` | [Directory](../modules/_types_.md#directory)‹string &#124; Buffer &#124; Readable› &#124; Array‹[DirectoryArrayEntry](../modules/_types_.md#directoryarrayentry)‹Buffer &#124; Readable›› |
+`data` | [Directory](../modules/_types_.md#directory)‹string &#124; Buffer &#124; Readable› &#124; Array‹[Entry](../modules/_types_.md#entry)‹Buffer &#124; Readable›› |
 `options?` | undefined &#124; object |
 
 **Returns:** *Promise‹string›*

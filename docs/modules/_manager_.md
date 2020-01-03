@@ -1,4 +1,4 @@
-[rif-storage](../README.md) › ["manager"](_manager_.md)
+[@rsksmart/rif-storage](../README.md) › ["manager"](_manager_.md)
 
 # External module: "manager"
 

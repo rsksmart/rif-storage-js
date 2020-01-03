@@ -1,6 +1,6 @@
-[rif-storage](README.md)
+[@rsksmart/rif-storage](README.md)
 
-# rif-storage
+# @rsksmart/rif-storage
 
 ## Index
 

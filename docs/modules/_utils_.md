@@ -1,4 +1,4 @@
-[rif-storage](../README.md) › ["utils"](_utils_.md)
+[@rsksmart/rif-storage](../README.md) › ["utils"](_utils_.md)
 
 # External module: "utils"
 
@@ -11,6 +11,7 @@
 
 ### Functions
 
+* [detectAddress](_utils_.md#detectaddress)
 * [isDirectory](_utils_.md#isdirectory)
 * [isFile](_utils_.md#isfile)
 * [isReadable](_utils_.md#isreadable)
@@ -26,7 +27,7 @@
 
 • **DIRECTORY_SYMBOL**: *unique symbol* =  Symbol.for('@rds-lib/directory')
 
-*Defined in [src/utils.ts:5](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/utils.ts#L5)*
+*Defined in [src/utils.ts:6](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L6)*
 
 ___
 
@@ -34,15 +35,31 @@ ___
 
 • **FILE_SYMBOL**: *unique symbol* =  Symbol.for('@rds-lib/file')
 
-*Defined in [src/utils.ts:4](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/utils.ts#L4)*
+*Defined in [src/utils.ts:5](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L5)*
 
 ## Functions
 
+###  detectAddress
+
+▸ **detectAddress**(`address`: string): *[Provider](../enums/_types_.provider.md) | false*
+
+*Defined in [src/utils.ts:110](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L110)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
+
+**Returns:** *[Provider](../enums/_types_.provider.md) | false*
+
+___
+
 ###  isDirectory
 
-▸ **isDirectory**(`obj`: object): *boolean*
+▸ **isDirectory**(`obj`: object): *obj is Directory<any>*
 
-*Defined in [src/utils.ts:62](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/utils.ts#L62)*
+*Defined in [src/utils.ts:63](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L63)*
 
 Verifies if the returned object is a directory
 
@@ -52,15 +69,15 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `obj` | object |   |
 
-**Returns:** *boolean*
+**Returns:** *obj is Directory<any>*
 
 ___
 
 ###  isFile
 
-▸ **isFile**(`obj`: object): *boolean*
+▸ **isFile**(`obj`: object): *obj is Entry<any>*
 
-*Defined in [src/utils.ts:47](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/utils.ts#L47)*
+*Defined in [src/utils.ts:48](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L48)*
 
 Verifies if the returned object is a file
 
@@ -70,7 +87,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `obj` | object |   |
 
-**Returns:** *boolean*
+**Returns:** *obj is Entry<any>*
 
 ___
 
@@ -78,7 +95,7 @@ ___
 
 ▸ **isReadable**(`entry`: unknown): *entry is Readable*
 
-*Defined in [src/utils.ts:97](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/utils.ts#L97)*
+*Defined in [src/utils.ts:98](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L98)*
 
 **Parameters:**
 
@@ -94,7 +111,7 @@ ___
 
 ▸ **isReadableOrBuffer**(`entry`: unknown): *entry is Readable | Buffer*
 
-*Defined in [src/utils.ts:105](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/utils.ts#L105)*
+*Defined in [src/utils.ts:106](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L106)*
 
 **Parameters:**
 
@@ -110,7 +127,7 @@ ___
 
 ▸ **isTSDirectory**<**T**>(`data`: object, `genericTest`: function): *data is Directory<T>*
 
-*Defined in [src/utils.ts:72](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/utils.ts#L72)*
+*Defined in [src/utils.ts:73](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L73)*
 
 **Type parameters:**
 
@@ -138,7 +155,7 @@ ___
 
 ▸ **isTSDirectoryArray**<**T**>(`data`: object, `genericTest`: function): *data is DirectoryArray<T>*
 
-*Defined in [src/utils.ts:84](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/utils.ts#L84)*
+*Defined in [src/utils.ts:85](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L85)*
 
 **Type parameters:**
 
@@ -166,7 +183,7 @@ ___
 
 ▸ **markDirectory**<**T**>(`obj`: T): *T*
 
-*Defined in [src/utils.ts:31](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/utils.ts#L31)*
+*Defined in [src/utils.ts:32](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L32)*
 
 Function that marks an object with Symbol signaling that it is a File object no matter what
 sort of implementation it is (Readable|Buffer|async generator etc)
@@ -191,7 +208,7 @@ ___
 
 ▸ **markFile**<**T**>(`obj`: T): *T*
 
-*Defined in [src/utils.ts:13](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/utils.ts#L13)*
+*Defined in [src/utils.ts:14](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/utils.ts#L14)*
 
 Function that marks an object with Symbol signaling that it is a Directory object.
 

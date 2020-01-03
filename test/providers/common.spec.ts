@@ -1,14 +1,13 @@
 import { ipfs as ipfsProvider, swarm as swarmProvider } from '../../src'
 import createIpfs from './ipfs/utils'
-import { Directory, Entry, IpfsStorageProvider, SwarmStorageProvider } from '../../src/types'
+import { Directory, IpfsStorageProvider, SwarmStorageProvider } from '../../src/types'
 import { ValueError } from '../../src/errors'
 
 import chai from 'chai'
 import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
-import { randomBuffer, streamToBuffer, streamToString } from '../utils'
+import { randomBuffer, streamToBuffer } from '../utils'
 import * as utils from '../../src/utils'
-import { Readable } from 'stream'
 
 // Do not reorder these statements - https://github.com/chaijs/chai/issues/1298
 chai.use(chaiAsPromised)
@@ -89,16 +88,26 @@ describe('Common providers tests', () => {
           return Promise.all(promises)
         })
       })
+
       describe('integration tests', () => {
-        describe('should correctly handle binary data', async function () {
+        it('should wrap files with metadata in directory', async function () {
+          const hash = await provider.put(Buffer.from('hello world'), { filename: 'poem.txt' }) as string
+          const fetched = await provider.get(hash) as Directory<Buffer>
+
+          expect(utils.isDirectory(fetched)).to.be.true()
+          expect(fetched).to.have.all.keys(['poem.txt', utils.DIRECTORY_SYMBOL])
+          expect(fetched['poem.txt'].data.toString()).to.eql('hello world')
+        })
+
+        describe('should correctly handle binary data', function () {
           const data = randomBuffer(20)
 
           it('Buffer - file', async function () {
             const hash = await provider.put(data) as string
-            const fetched = await provider.get(hash) as Entry<Buffer>
+            const fetched = await provider.get(hash)
 
             expect(utils.isFile(fetched)).to.be.true()
-            expect(data.equals(fetched.data as Buffer)).to.be.true()
+            expect(data.equals(fetched as Buffer)).to.be.true()
           })
 
           it('Buffer - directory', async function () {

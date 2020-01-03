@@ -1,4 +1,4 @@
-[rif-storage](../README.md) › ["types"](../modules/_types_.md) › [SwarmStorageProvider](_types_.swarmstorageprovider.md)
+[@rsksmart/rif-storage](../README.md) › ["types"](../modules/_types_.md) › [SwarmStorageProvider](_types_.swarmstorageprovider.md)
 
 # Interface: SwarmStorageProvider
 
@@ -27,7 +27,7 @@
 
 • **bzz**: *Bzz*
 
-*Defined in [src/types.ts:111](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/types.ts#L111)*
+*Defined in [src/types.ts:125](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L125)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[type](_types_.storageprovider.md#type)*
 
-*Defined in [src/types.ts:71](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/types.ts#L71)*
+*Defined in [src/types.ts:78](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L78)*
 
 ## Methods
 
@@ -47,11 +47,15 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[get](_types_.storageprovider.md#get)*
 
-*Defined in [src/types.ts:82](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/types.ts#L82)*
+*Defined in [src/types.ts:93](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L93)*
 
 Retrieves data from provider's network.
 
-You can distinguish between returned objects using `isDirectory(obj)` or `isFile(obj)`.
+You can distinguish between returned objects using `isDirectory(obj)` or `isFile(obj)` utility functions.
+
+Addresses that point to single files are handled in two ways.
+ - if address contains raw data then Buffer is returned
+ - if address contains file with metadata (content-type, filename) then it is returned as single unit [Directory](../modules/_types_.md#directory)
 
 **Parameters:**
 
@@ -62,7 +66,7 @@ Name | Type | Description |
 
 **Returns:** *Promise‹[Directory](../modules/_types_.md#directory)‹Buffer› | Buffer›*
 
-`Buffer` if the address was pointing to single file. [Directory](../modules/_types_.md#directory) if the address was pointing to directory
+Buffer object if the address was pointing to raw data. [Directory](../modules/_types_.md#directory) otherwise.
 
 ___
 
@@ -72,7 +76,7 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[getReadable](_types_.storageprovider.md#getreadable)*
 
-*Defined in [src/types.ts:91](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/types.ts#L91)*
+*Defined in [src/types.ts:102](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L102)*
 
 Retrieves data from provider's network using streaming support.
 
@@ -85,7 +89,7 @@ Name | Type | Description |
 
 **Returns:** *Promise‹Readable›*
 
-`Readable` in object mode that yields [DirectoryArrayEntry](../modules/_types_.md#directoryarrayentry) objects with `Readable` as `data`. The `data` has to be fully processed before moving to next entry.
+`Readable` in object mode that yields [Entry](../modules/_types_.md#entry) objects with `Readable` as `data`. The `data` has to be fully processed before moving to next entry.
 
 ___
 
@@ -95,9 +99,12 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[put](_types_.storageprovider.md#put)*
 
-*Defined in [src/types.ts:100](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/types.ts#L100)*
+*Defined in [src/types.ts:114](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L114)*
 
 Stores data on provider's network
+
+If to the data are given some metadata (content-type or filename), then the original data are wrapped in directory
+in order to persist these metadata.
 
 **Parameters:**
 
@@ -114,7 +121,7 @@ Address of the stored data
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[put](_types_.storageprovider.md#put)*
 
-*Defined in [src/types.ts:101](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/types.ts#L101)*
+*Defined in [src/types.ts:115](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L115)*
 
 **Parameters:**
 

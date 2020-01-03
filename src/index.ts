@@ -1,6 +1,6 @@
 import ipfs from './providers/ipfs'
 import swarm from './providers/swarm'
-import { Provider, Options, IpfsStorageProvider, SwarmStorageProvider } from './types'
+import { Provider, ProviderOptions, IpfsStorageProvider, SwarmStorageProvider } from './types'
 import { ClientOptions, IpfsClient } from 'ipfs-http-client'
 import { BzzConfig } from '@erebos/api-bzz-base'
 import { Manager } from './manager'
@@ -12,7 +12,7 @@ import { Manager } from './manager'
  * @param provider
  * @param options
  */
-function factory (provider: Provider, options: Options): IpfsStorageProvider | SwarmStorageProvider | Manager {
+function factory (provider: Provider, options: ProviderOptions): IpfsStorageProvider | SwarmStorageProvider | Manager {
   if (!options) {
     throw new Error('You have to pass options!')
   }

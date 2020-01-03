@@ -2,8 +2,8 @@ import {
   AllProviders,
   Directory,
   DirectoryArray,
-  DirectoryArrayEntry,
-  Options,
+  Entry,
+  ProviderOptions,
   Provider,
   StorageProvider
 } from './types'
@@ -21,7 +21,7 @@ import { detectAddress } from './utils'
  * When registering providers the first one will become the active one by default.
  *
  * For getting data it is decided based on provided address what Provider should be used. If
- * provider for given address is not given, then error is thrown.
+ * provider for given address is not registered, then error is thrown.
  *
  * For putting data, there is concept of "active" provider, that the data are passed to.
  * The first provider that you register automatically becomes the active provider. You can
@@ -42,8 +42,8 @@ import { detectAddress } from './utils'
  storage.makeActive(Provider.SWARM)
  const swarmHash = await storage.put(Buffer.from('hello swarm!')) // Stored to Swarm
 
- console.log(storage.get(ipfsHash)) // Retrieves data from IPFS and prints 'hello ipfs!'
- console.log(storage.get(swarmHash)) // Retrieves data from Swarm and prints 'hello swarm!'
+ console.log(storage.get(ipfsHash).toString()) // Retrieves data from IPFS and prints 'hello ipfs!'
+ console.log(storage.get(swarmHash).toString()) // Retrieves data from Swarm and prints 'hello swarm!'
  ```
  */
 export class Manager implements StorageProvider<string, object, object> {
@@ -76,7 +76,7 @@ export class Manager implements StorageProvider<string, object, object> {
    * @throws {TypeError} if no type is provided
    * @throws {ValueError} if invalid type is provided
    */
-  addProvider (type: Provider, options: Options): void {
+  addProvider (type: Provider, options: ProviderOptions): void {
     if (!type) {
       throw new TypeError('type is required!')
     }
@@ -112,6 +112,7 @@ export class Manager implements StorageProvider<string, object, object> {
         throw new ProviderError('You wanted to fetched IPFS address, but you haven\'t register IPFS provider!')
       }
 
+      // "!" is TS syntax for forcing compiler to not complain about possible null or undefined
       return this.providers[Provider.IPFS]![fnName](address, options)
     } else if (detected === Provider.SWARM) {
       if (this.providers[Provider.SWARM] === undefined) {
@@ -128,7 +129,7 @@ export class Manager implements StorageProvider<string, object, object> {
    * Retrieves data from provider.
    *
    * It detects which provider to use based on the format of provided address. If the detected
-   * provider is not registered then exception is raised
+   * provider is not registered then exception is raised.
    *
    * @param address
    * @param options
@@ -165,7 +166,7 @@ export class Manager implements StorageProvider<string, object, object> {
    * @see Storage#put
    */
   put (data: string | Buffer | Readable, options?: object): Promise<string>
-  put (data: Directory<string | Buffer | Readable> | Array<DirectoryArrayEntry<Buffer | Readable>>, options?: object): Promise<string>
+  put (data: Directory<string | Buffer | Readable> | Array<Entry<Buffer | Readable>>, options?: object): Promise<string>
   put (data: string | Buffer | Readable | Directory<string | Buffer | Readable> | DirectoryArray<Buffer | Readable>, options?: object): Promise<string> {
     if (!this.activeProvider) {
       throw new ProviderError('Before putting any data, you have to first add some provider!')
