@@ -19,28 +19,16 @@ or when retrieving data using `get()` in case the address is not a single file.
 
 ### Properties
 
-* [contentType](_types_.directoryentry.md#optional-contenttype)
 * [data](_types_.directoryentry.md#data)
 * [size](_types_.directoryentry.md#optional-size)
 
 ## Properties
 
-### `Optional` contentType
-
-• **contentType**? : *undefined | string*
-
-*Defined in [src/types.ts:33](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L33)*
-
-Applicable only for Swarm provider.
-When left undefined than the data are stored as `raw`.
-
-___
-
 ###  data
 
 • **data**: *T*
 
-*Defined in [src/types.ts:27](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L27)*
+*Defined in [src/types.ts:27](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L27)*
 
 ___
 
@@ -48,7 +36,7 @@ ___
 
 • **size**? : *undefined | number*
 
-*Defined in [src/types.ts:39](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L39)*
+*Defined in [src/types.ts:33](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L33)*
 
 Applicable mainly for Swarm provider.
 Required when `data` is Readable.

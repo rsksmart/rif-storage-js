@@ -27,7 +27,7 @@
 
 • **bzz**: *Bzz*
 
-*Defined in [src/types.ts:125](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L125)*
+*Defined in [src/types.ts:119](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L119)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[type](_types_.storageprovider.md#type)*
 
-*Defined in [src/types.ts:78](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L78)*
+*Defined in [src/types.ts:72](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L72)*
 
 ## Methods
 
@@ -47,7 +47,7 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[get](_types_.storageprovider.md#get)*
 
-*Defined in [src/types.ts:93](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L93)*
+*Defined in [src/types.ts:87](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L87)*
 
 Retrieves data from provider's network.
 
@@ -55,7 +55,7 @@ You can distinguish between returned objects using `isDirectory(obj)` or `isFile
 
 Addresses that point to single files are handled in two ways.
  - if address contains raw data then Buffer is returned
- - if address contains file with metadata (content-type, filename) then it is returned as single unit [Directory](../modules/_types_.md#directory)
+ - if address contains file with metadata (filename) then it is returned as single unit [Directory](../modules/_types_.md#directory)
 
 **Parameters:**
 
@@ -76,7 +76,7 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[getReadable](_types_.storageprovider.md#getreadable)*
 
-*Defined in [src/types.ts:102](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L102)*
+*Defined in [src/types.ts:96](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L96)*
 
 Retrieves data from provider's network using streaming support.
 
@@ -99,11 +99,11 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[put](_types_.storageprovider.md#put)*
 
-*Defined in [src/types.ts:114](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L114)*
+*Defined in [src/types.ts:108](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L108)*
 
 Stores data on provider's network
 
-If to the data are given some metadata (content-type or filename), then the original data are wrapped in directory
+If to the data are given some metadata (filename), then the original data are wrapped in directory
 in order to persist these metadata.
 
 **Parameters:**
@@ -121,7 +121,7 @@ Address of the stored data
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[put](_types_.storageprovider.md#put)*
 
-*Defined in [src/types.ts:115](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L115)*
+*Defined in [src/types.ts:109](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L109)*
 
 **Parameters:**
 
