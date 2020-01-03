@@ -1,4 +1,4 @@
-[rif-storage](../README.md) › ["errors"](_errors_.md)
+[@rsksmart/rif-storage](../README.md) › ["errors"](_errors_.md)
 
 # External module: "errors"
 

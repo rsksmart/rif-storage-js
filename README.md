@@ -197,7 +197,7 @@ Used both for data input (eq. as part of [`Directory`] for `put()`) or when retr
 ### [`DirectoryArray`] 
 
 Alternative data structure for representing directories. Used mainly together with streaming. 
-It is an array containing `DirectoryArrayEntry` objects that is `DirectoryEntry & { path: string }`
+It is an array containing `Entry` objects that is `DirectoryEntry & { path: string }`
 
 Example:
 
@@ -220,23 +220,30 @@ Interface implemented by IPFS and Swarm providers. Returned by [`factory()`](#fa
 
 #### [`StorageProvider.put(data, options) -> Promise<string>`](./docs/interfaces/_types_.storageprovider.md#put)
 
+##### Filenames
+
+When you are adding single-file or buffer/string/readable you can specify file-name under which it should be stored, using
+the `options`. When you do that the original data are wrapped in folder in order to persist this information. Therefore
+when you `.get()` this address then the result will be [`Directory`](#directory-interface) of one file.
+
 Parameters:
  * `data` - one of the following: 
     * `string`, `Buffer`, `Readable` that represents single file
     * [`Directory<string | Buffer | Readable>`](#directory-interface) | [`DirectoryArray<Buffer | Readable>`](#directoryarray)
- * `options` - options passed to either IPFS's `add()` or Swarms `upload()` functions.
+ * `options` - options passed to either IPFS's `add()` or Swarms `upload()` functions, they share:
+    * `filename?: string` - applicable only for single files, see [note](#filenames) before
  
 #### [`StorageProvider.get(address, options) -> Promise<Directory<Buffer> | Buffer>`](./docs/interfaces/_types_.storageprovider.md#get)
 
-Retrieves data from provider's network
+Retrieves data from provider's network.
 
 Parameters:
  * `address` - string hash or CID
  * `options` - options passed to either IPFS's `get()` or [Erebos]'s `download()` functions.
  
 Returns:
- * `Buffer` if the address was pointing to single file
- * `Directory` if the address was pointing to directory
+ * `Buffer` if the address was pointing to single raw file
+ * `Directory` if the address was pointing to directory or single file with metadata
  
 You can distinguish between these two using `isDirectory(obj)` or `isFile(obj)`.
 
@@ -257,7 +264,7 @@ Parameters:
  * `address` - string hash or CID
  * `options` - options passed to either IPFS's `getReadable()` or [Erebos]'s `downloadStream()` functions.
  
-Returns `Readable` in object mode that yields [`DirectoryArrayEntry`] objects with `Readable` as `data`.
+Returns `Readable` in object mode that yields [`Entry`] objects with `Readable` as `data`.
 The `data` has to be fully processed before moving to next entry.
  
 ## Contribute
@@ -278,4 +285,4 @@ There are some ways you can make this module better:
 [`StorageProvider`]: ./docs/interfaces/_types_.storageprovider.md
 [`Directory`]: ./docs/modules/_types_.md#Directory
 [`DirectoryArray`]: ./docs/modules/_types_.md#DirectoryArray
-[`DirectoryArrayEntry`]: ./docs/modules/_types_.md#DirectoryArrayEntry
+[`Entry`]: ./docs/modules/_types_.md#Entry

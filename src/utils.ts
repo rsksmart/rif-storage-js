@@ -1,4 +1,4 @@
-import { Directory, DirectoryArray, Provider } from './types'
+import { Directory, DirectoryArray, Entry, Provider } from './types'
 import { Readable } from 'stream'
 import CID from 'cids'
 
@@ -45,7 +45,7 @@ export function markDirectory<T extends object> (obj: T): T {
  *
  * @param obj
  */
-export function isFile (obj: object): boolean {
+export function isFile (obj: object): obj is Entry<any> {
   if (typeof obj !== 'object' || obj === null) {
     throw TypeError('obj is not object!')
   }
@@ -60,7 +60,7 @@ export function isFile (obj: object): boolean {
  *
  * @param obj
  */
-export function isDirectory (obj: object): boolean {
+export function isDirectory (obj: object): obj is Directory<any> {
   if (typeof obj !== 'object' || obj === null) {
     throw TypeError('obj is not object!')
   }

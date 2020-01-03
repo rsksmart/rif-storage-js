@@ -111,7 +111,7 @@ function mapDataToIpfs<T> (data: Directory<T>): Array<IpfsObject<T>> {
  * @param options
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function put (this: IpfsStorageProvider, data: PutInputs, options?: RegularFiles.AddOptions): Promise<any> {
+async function put (this: IpfsStorageProvider, data: PutInputs, options?: RegularFiles.AddOptions & { filename?: string }): Promise<any> {
   options = options || {}
 
   if (typeof data === 'string') {
@@ -119,13 +119,34 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: Regula
   }
 
   // Convert single element DirectoryArray
-  if (typeof data === 'object' && Array.isArray(data) && data.length === 1) {
-    data = data[0].data
+  if (Array.isArray(data) && data.length === 1) {
+    const el = data[0]
+    data = el.data
+
+    if (!options.filename && el.path) {
+      options.filename = el.path
+    }
   }
 
   if (Buffer.isBuffer(data) || isReadable(data as Readable)) {
     log('uploading single file')
-    return (await this.ipfs.add(data as Buffer | Readable, options))[0].hash
+    let dataToAdd: PutInputs | Array<IpfsObject<Buffer | Readable>>
+
+    if (options.filename) {
+      dataToAdd = [
+        {
+          content: data as Buffer | Readable,
+          path: options.filename || ''
+        }
+      ]
+      delete options.filename
+      options.wrapWithDirectory = true
+    } else {
+      dataToAdd = data
+    }
+
+    const result = (await this.ipfs.add(dataToAdd as Buffer | Readable, options))
+    return result[result.length - 1].hash
   }
 
   log('uploading directory')
@@ -133,6 +154,10 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: Regula
 
   if ((typeof data !== 'object' && !Array.isArray(data)) || data === null) {
     throw new TypeError('data have to be string, Readable, Buffer, DirectoryArray or Directory object!')
+  }
+
+  if (options.filename) {
+    throw new ValueError('You are uploading directory, yet you specified filename that is not applicable here!')
   }
 
   if ((Array.isArray(data) && data.length === 0) || Object.keys(data).length === 0) {
@@ -176,8 +201,15 @@ async function get (this: IpfsStorageProvider, address: CidAddress, options?: Re
     return markDirectory(mapDataFromIpfs(result, address))
   }
 
+  const file = result[0]
+
+  // Empty content means it is an empty folder
+  if (!file.content) {
+    return markDirectory({})
+  }
+
   log(`fetching single file from ${address}`)
-  return markFile(result[0].content)
+  return markFile(file.content)
 }
 
 /**

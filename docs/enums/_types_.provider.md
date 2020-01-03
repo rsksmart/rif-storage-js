@@ -1,4 +1,4 @@
-[rif-storage](../README.md) › ["types"](../modules/_types_.md) › [Provider](_types_.provider.md)
+[@rsksmart/rif-storage](../README.md) › ["types"](../modules/_types_.md) › [Provider](_types_.provider.md)
 
 # Enumeration: Provider
 
@@ -18,7 +18,7 @@ Enum of supported providers.
 
 • **IPFS**: = "ipfs"
 
-*Defined in [src/types.ts:12](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/types.ts#L12)*
+*Defined in [src/types.ts:12](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L12)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **MANAGER**: = "manager"
 
-*Defined in [src/types.ts:11](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/types.ts#L11)*
+*Defined in [src/types.ts:11](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L11)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **SWARM**: = "swarm"
 
-*Defined in [src/types.ts:13](https://github.com/rsksmart/rds-libjs/blob/1cdc7dd/src/types.ts#L13)*
+*Defined in [src/types.ts:13](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L13)*
