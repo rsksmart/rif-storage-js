@@ -27,12 +27,6 @@ export interface DirectoryEntry<T> {
   data: T
 
   /**
-   * Applicable only for Swarm provider.
-   * When left undefined than the data are stored as `raw`.
-   */
-  contentType?: string
-
-  /**
    * Applicable mainly for Swarm provider.
    * Required when `data` is Readable.
    */
@@ -84,7 +78,7 @@ export interface StorageProvider<Addr, GetOpts, PutOpts extends PutOptions> {
    *
    * Addresses that point to single files are handled in two ways.
    *  - if address contains raw data then Buffer is returned
-   *  - if address contains file with metadata (content-type, filename) then it is returned as single unit [[Directory]]
+   *  - if address contains file with metadata (filename) then it is returned as single unit [[Directory]]
    *
    * @param address string hash or CID
    * @param options options passed to either IPFS's `get()` or Erebos's `download()` functions
@@ -104,7 +98,7 @@ export interface StorageProvider<Addr, GetOpts, PutOpts extends PutOptions> {
   /**
    * Stores data on provider's network
    *
-   * If to the data are given some metadata (content-type or filename), then the original data are wrapped in directory
+   * If to the data are given some metadata (filename), then the original data are wrapped in directory
    * in order to persist these metadata.
    *
    * @param data

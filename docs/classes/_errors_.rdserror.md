@@ -34,7 +34,7 @@ Base error for all RDS errors
 
 \+ **new RdsError**(`message`: string): *[RdsError](_errors_.rdserror.md)*
 
-*Defined in [src/errors.ts:5](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/errors.ts#L5)*
+*Defined in [src/errors.ts:5](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/errors.ts#L5)*
 
 **Parameters:**
 
@@ -90,4 +90,4 @@ ___
 
 ▪ **code**: *string* = "RDS_ERR"
 
-*Defined in [src/errors.ts:5](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/errors.ts#L5)*
+*Defined in [src/errors.ts:5](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/errors.ts#L5)*

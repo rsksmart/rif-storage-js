@@ -89,7 +89,6 @@ async function put (this: SwarmStorageProvider, data: PutInputs, options?: Uploa
   // Convert single element DirectoryArray
   if (Array.isArray(data) && data.length === 1) {
     const el = data[0]
-    options.contentType = options.contentType || el.contentType
     options.size = options.size || el.size
     options.filename = options.filename || el.path
     data = el.data
@@ -105,15 +104,13 @@ async function put (this: SwarmStorageProvider, data: PutInputs, options?: Uploa
         {
           data: data as Buffer | Readable,
           path: options.filename,
-          size: options.size,
-          contentType: options.contentType
+          size: options.size
         }
       ]
 
       options.defaultPath = options.filename
       delete options.filename
       delete options.size
-      delete options.contentType
     } else {
       log('uploading single buffer file')
 

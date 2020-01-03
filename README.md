@@ -179,7 +179,6 @@ Directory represents directory structure where keys are paths and values is `Dir
 const directory = {
   'some/directory/with/file': {
     data: 'some string to store',
-    contentType: 'text/plain',
     size: 20
   }
 }
@@ -191,7 +190,6 @@ Object represents a file and some of its metadata in [`Directory`] object.
 Used both for data input (eq. as part of [`Directory`] for `put()`) or when retrieving data using `get()` in case the address is not a single file.
 
  * `data` can be `string`, `Buffer`, `Readable`
- * `contentType?: string` is applicable only for Swarm provider.
  * `size?: number` can be left out except when `data` is `Readable`. Only applicable for Swarm.
 
 ### [`DirectoryArray`] 
