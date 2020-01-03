@@ -294,7 +294,7 @@ describe('Swarm provider', () => {
       expect(fetched['some_file_name.pdf'].data.toString()).to.equal('hello world')
     })
 
-    it.skip('should get readable file', async () => {
+    it('should get readable file', async () => {
       const hash = (await bzz.uploadFile(Buffer.from('hello world'), { contentType: 'plain/text' }))
 
       const stream = await provider.getReadable(hash)
@@ -325,12 +325,6 @@ describe('Swarm provider', () => {
 
       expect(count).eql(1)
     })
-
-    // it('should throw when not found', () => {
-    //   const cid = 'QmY2ERw3nB19tVKKVF18Wq5idNL91gaNzCk1eaSq6S1J1i'
-    //
-    //   return expect(provider.get(cid)).to.be.eventually.fulfilled()
-    // })
 
     it('should get directory', async () => {
       const file = { data: Buffer.from('some-data') }

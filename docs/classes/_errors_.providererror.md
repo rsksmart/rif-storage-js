@@ -31,7 +31,7 @@ Error related to Manager and its Providers
 
 *Overrides [RdsError](_errors_.rdserror.md).[constructor](_errors_.rdserror.md#constructor)*
 
-*Defined in [src/errors.ts:30](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/errors.ts#L30)*
+*Defined in [src/errors.ts:30](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/errors.ts#L30)*
 
 **Parameters:**
 
@@ -81,4 +81,4 @@ ___
 
 *Overrides [RdsError](_errors_.rdserror.md).[code](_errors_.rdserror.md#static-code)*
 
-*Defined in [src/errors.ts:30](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/errors.ts#L30)*
+*Defined in [src/errors.ts:30](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/errors.ts#L30)*

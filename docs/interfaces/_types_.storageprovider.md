@@ -42,7 +42,7 @@ Generic interface that every provider has to implement.
 
 • **type**: *[Provider](../enums/_types_.provider.md)*
 
-*Defined in [src/types.ts:78](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L78)*
+*Defined in [src/types.ts:72](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L72)*
 
 ## Methods
 
@@ -50,7 +50,7 @@ Generic interface that every provider has to implement.
 
 ▸ **get**(`address`: Addr, `options?`: GetOpts): *Promise‹[Directory](../modules/_types_.md#directory)‹Buffer› | Buffer›*
 
-*Defined in [src/types.ts:93](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L93)*
+*Defined in [src/types.ts:87](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L87)*
 
 Retrieves data from provider's network.
 
@@ -58,7 +58,7 @@ You can distinguish between returned objects using `isDirectory(obj)` or `isFile
 
 Addresses that point to single files are handled in two ways.
  - if address contains raw data then Buffer is returned
- - if address contains file with metadata (content-type, filename) then it is returned as single unit [Directory](../modules/_types_.md#directory)
+ - if address contains file with metadata (filename) then it is returned as single unit [Directory](../modules/_types_.md#directory)
 
 **Parameters:**
 
@@ -77,7 +77,7 @@ ___
 
 ▸ **getReadable**(`address`: Addr, `options?`: GetOpts): *Promise‹Readable›*
 
-*Defined in [src/types.ts:102](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L102)*
+*Defined in [src/types.ts:96](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L96)*
 
 Retrieves data from provider's network using streaming support.
 
@@ -98,11 +98,11 @@ ___
 
 ▸ **put**(`data`: string | Buffer | Readable, `options?`: PutOpts): *Promise‹Addr›*
 
-*Defined in [src/types.ts:114](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L114)*
+*Defined in [src/types.ts:108](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L108)*
 
 Stores data on provider's network
 
-If to the data are given some metadata (content-type or filename), then the original data are wrapped in directory
+If to the data are given some metadata (filename), then the original data are wrapped in directory
 in order to persist these metadata.
 
 **Parameters:**
@@ -118,7 +118,7 @@ Address of the stored data
 
 ▸ **put**(`data`: [Directory](../modules/_types_.md#directory)‹string | Buffer | Readable› | [DirectoryArray](../modules/_types_.md#directoryarray)‹Buffer | Readable›, `options?`: PutOpts): *Promise‹Addr›*
 
-*Defined in [src/types.ts:115](https://github.com/rsksmart/rds-libjs/blob/b42e838/src/types.ts#L115)*
+*Defined in [src/types.ts:109](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L109)*
 
 **Parameters:**
 
