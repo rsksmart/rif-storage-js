@@ -7,10 +7,6 @@
     "Swarm",
     "RSK"
   ],
-  "browser": {
-    "@erebos/api-bzz-node": "@erebos/api-bzz-browser",
-    "stream": "readable-stream"
-  },
   "homepage": "https://github.com/rsksmart/rif-storage-js",
   "bugs": {
     "url": "https://github.com/rsksmart/rif-storage-js/issues/"
@@ -22,6 +18,10 @@
     "dist"
   ],
   "main": "lib/index.js",
+  "browser": {
+    "@erebos/api-bzz-node": "@erebos/api-bzz-browser",
+    "stream": "readable-stream"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/rsksmart/rif-storage-js.git"
@@ -37,14 +37,16 @@
     "build": "tasegir build",
     "test": "tasegir test",
     "test:node": "tasegir test --target node",
-    "test:browser": "tasegir test --target browser"
+    "test:browser": "tasegir test --target browser --target webworker"
   },
   "dependencies": {
+    "@erebos/api-bzz-base": "^0.12.0",
     "@erebos/api-bzz-browser": "^0.12.0",
     "@erebos/api-bzz-node": "^0.12.0",
     "cids": "^0.7.1",
     "debug": "^4.1.0",
     "ipfs-http-client": "^40.1.0",
+    "multiaddr": "^7.2.1",
     "readable-stream": "^3.4.0",
     "tar-stream": "^2.1.0"
   },
@@ -74,6 +76,7 @@
     "node": ">=10.0.0",
     "npm": ">=6.0.0"
   },
+  "types": "types/index.d.ts",
   "contributors": [
     "Adam Uhlíř <adam@uhlir.dev>"
   ]
