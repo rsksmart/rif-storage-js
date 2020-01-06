@@ -31,7 +31,6 @@ jobs:
       - run:
           name: "Code linting"
           command: npx tasegir lint
-      - sonarcloud/scan
     
   node-tests:
     parameters:
@@ -59,7 +58,7 @@ jobs:
       - run:
           name: "Node tests"
           command: npx tasegir test --target node --reporter lcovonly -- --bail
-
+      - sonarcloud/scan
 
   chrome:
     docker:
@@ -88,7 +87,7 @@ jobs:
           name: "Browser tests"
           command: npx tasegir test -t browser -t webworker
 
-          
+
     # TODO: Currently not used. Failing most probably because of CORS restrictions, which I did not managed to overcome. Firefox does not allow to disable this check and I have not managed to set Karma to support this.
     # Yet I am not 100% sure if it is really the problem.
   #  firefox:
@@ -182,21 +181,23 @@ workflows:
   version: 2
   test:
     jobs:
-      - check:
-          context: SonarCloud
+      - check
       - node-tests:
           version: '10'
           name: node-10
+          context: SonarCloud
           requires:
             - check
       - node-tests:
           version: '12'
           name: node-12
+          context: SonarCloud
           requires:
             - check
       - node-tests:
           version: '13'
           name: node-13
+          context: SonarCloud
           requires:
             - check
       - chrome:
