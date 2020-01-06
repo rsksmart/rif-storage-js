@@ -1,8 +1,5 @@
 version: 2.1
 
-orbs:
-  sonarcloud: sonarsource/sonarcloud@1.0.1
-
 jobs:
   check:
     docker:
@@ -34,7 +31,8 @@ jobs:
       - run:
           name: "Code linting"
           command: npx tasegir lint
-
+      - sonarcloud/scan
+    
   node-tests:
     parameters:
       version:
@@ -61,7 +59,7 @@ jobs:
       - run:
           name: "Node tests"
           command: npx tasegir test --target node --reporter lcovonly -- --bail
-      - sonarcloud/scan
+
 
   chrome:
     docker:
@@ -176,38 +174,37 @@ jobs:
           name: "Browser tests"
           command: npx tasegir test -t electron-renderer --bail
 
+orbs:
+  sonarcloud: sonarsource/sonarcloud@1.0.1
+
 workflows:
   version: 2
   test:
     jobs:
-      - check
+      - check:
+          context: SonarCloud
       - node-tests:
           version: '10'
           name: node-10
-          context: SonarCloud
           requires:
             - check
       - node-tests:
           version: '12'
           name: node-12
-          context: SonarCloud
           requires:
             - check
       - node-tests:
           version: '13'
           name: node-13
-          context: SonarCloud
           requires:
             - check
       - chrome:
-          context: SonarCloud
           requires:
             - check
       #- firefox:
       #    requires:
       #      - check
       - electron-main:
-          context: SonarCloud
           requires:
             - check
 #      - electron-renderer:
