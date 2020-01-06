@@ -88,6 +88,7 @@ jobs:
           name: "Browser tests"
           command: npx tasegir test -t browser -t webworker
 
+          
     # TODO: Currently not used. Failing most probably because of CORS restrictions, which I did not managed to overcome. Firefox does not allow to disable this check and I have not managed to set Karma to support this.
     # Yet I am not 100% sure if it is really the problem.
   #  firefox:
