@@ -14,7 +14,7 @@ jobs:
             - node-v1-
       - run:
           name: "Install deps"
-          command: npm install
+          command: npm ci
       - save_cache:
           paths:
             - ./node_modules
@@ -31,6 +31,7 @@ jobs:
       - run:
           name: "Code linting"
           command: npx tasegir lint
+    
   node-tests:
     parameters:
       version:
@@ -54,13 +55,10 @@ jobs:
       - run:
           name: Wait for Swarm
           command: dockerize -wait tcp://localhost:8500 -timeout 2m
-
       - run:
           name: "Node tests"
-          command: npm run test:node -- --bail
-      - run:
-          name: "Test coverage"
-          command: npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov
+          command: npx tasegir test --target node --reporter lcovonly -- --bail
+      - sonarcloud/scan
 
   chrome:
     docker:
@@ -76,7 +74,7 @@ jobs:
             - node-v1-
       - run:
           name: "Install deps"
-          command: npm install
+          command: npm ci
       - run:
           name: install dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
@@ -87,9 +85,8 @@ jobs:
           command: dockerize -wait tcp://localhost:8500 -timeout 2m
       - run:
           name: "Browser tests"
-          # TODO: Waiting for release of Erebos fixing Web-worker integration
-          # command: npx tasegir test -t browser -t webworker
-          command: npx tasegir test -t browser
+          command: npx tasegir test -t browser -t webworker
+
 
     # TODO: Currently not used. Failing most probably because of CORS restrictions, which I did not managed to overcome. Firefox does not allow to disable this check and I have not managed to set Karma to support this.
     # Yet I am not 100% sure if it is really the problem.
@@ -112,15 +109,13 @@ jobs:
   #            DOCKERIZE_VERSION: v0.3.0
   #      - run:
   #          name: "Install deps"
-  #          command: npm install
+  #          command: npm ci
   #      - run:
   #          name: Wait for Swarm
   #          command: dockerize -wait tcp://localhost:8500 -timeout 2m
   #      - run:
   #          name: "Browser tests"
-  #          # TODO: Waiting for release of Erebos fixing Web-worker integration
-  #          #command: npx tasegir test -t browser -t webworker -- --browsers FirefoxHeadless
-  #          command: npx tasegir test -t browser -- --browsers FirefoxHeadless
+  #          command: npx tasegir test -t browser -t webworker -- --browsers FirefoxHeadless
 
   electron-main:
     docker:
@@ -144,7 +139,7 @@ jobs:
           command: sudo apt-get install -y libgconf-2-4 libasound2 libxss1 xvfb gcc-multilib g++-multilib icnsutils graphicsmagick xz-utils libudev-dev libnss3 libgtk-3-0
       - run:
           name: "Install deps"
-          command: npm install
+          command: npm ci
       - run:
           name: Wait for Swarm
           command: dockerize -wait tcp://localhost:8500 -timeout 2m
@@ -179,24 +174,29 @@ jobs:
           name: "Browser tests"
           command: npx tasegir test -t electron-renderer --bail
 
+orbs:
+  sonarcloud: sonarsource/sonarcloud@1.0.1
+
 workflows:
-  version: 2
   test:
     jobs:
       - check
       - node-tests:
           version: '10'
           name: node-10
+          context: SonarCloud
           requires:
             - check
       - node-tests:
           version: '12'
           name: node-12
+          context: SonarCloud
           requires:
             - check
       - node-tests:
           version: '13'
           name: node-13
+          context: SonarCloud
           requires:
             - check
       - chrome:
