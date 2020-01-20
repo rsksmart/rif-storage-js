@@ -30,6 +30,7 @@ function factory (provider: Provider, options: ProviderOptions): IpfsStorageProv
 }
 
 export default factory
-export { Provider, Manager }
+export { Manager }
 export { ipfs, swarm }
 export { isFile, isDirectory } from './utils'
+export * from './types'
