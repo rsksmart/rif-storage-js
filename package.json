@@ -70,7 +70,7 @@
     "sinon": "^8.1.0",
     "tasegir": "^1.6.0",
     "typedoc": "^0.16.7",
-    "typedoc-plugin-markdown": "^2.2.14"
+    "typedoc-plugin-markdown": "^2.2.16"
   },
   "engines": {
     "node": ">=10.0.0",
