@@ -19,8 +19,9 @@
   ],
   "main": "lib/index.js",
   "browser": {
-    "@erebos/api-bzz-node": "@erebos/api-bzz-browser",
-    "stream": "readable-stream"
+    "./src/swarm-mini/utils/data.ts": "./src/swarm-mini/utils/data.browser.ts",
+    "stream": "readable-stream",
+    "@erebos/api-bzz-node": "@erebos/api-bzz-browser"
   },
   "repository": {
     "type": "git",
@@ -40,17 +41,19 @@
     "test:browser": "tasegir test --target browser --target webworker"
   },
   "dependencies": {
-    "@erebos/api-bzz-base": "^0.12.0",
-    "@erebos/api-bzz-browser": "^0.12.0",
-    "@erebos/api-bzz-node": "^0.12.0",
     "cids": "^0.7.2",
     "debug": "^4.1.0",
+    "form-data": "^3.0.0",
     "ipfs-http-client": "^41.0.0",
+    "ky": "^0.16.2",
+    "ky-universal": "^0.3.0",
     "multiaddr": "^7.2.1",
     "readable-stream": "^3.5.0",
     "tar-stream": "^2.1.0"
   },
   "devDependencies": {
+    "@erebos/api-bzz-browser": "^0.12.0",
+    "@erebos/api-bzz-node": "^0.12.0",
     "@types/chai": "^4.2.7",
     "@types/chai-as-promised": "^7.1.2",
     "@types/debug": "^4.1.5",

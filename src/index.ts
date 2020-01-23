@@ -2,8 +2,8 @@ import ipfs from './providers/ipfs'
 import swarm from './providers/swarm'
 import { Provider, ProviderOptions, IpfsStorageProvider, SwarmStorageProvider } from './types'
 import { ClientOptions, IpfsClient } from 'ipfs-http-client'
-import { BzzConfig } from '@erebos/api-bzz-base'
 import { Manager } from './manager'
+import { BzzConfig } from './swarm-mini'
 
 /**
  * Main entry point of the library that serves as a factory to create instances of StorageProvider

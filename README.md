@@ -117,11 +117,12 @@ console.log(storage.get(swarmHash)) // Retrieves data from Swarm and prints 'hel
 This library integrates several (decentralized) storage providers, currently supported is:
  
  - [IPFS](https://ipfs.io/) using [js-ipfs-http-client]
- - [Swarm](http://swarm-guide.readthedocs.io/) using [Erebos] library
+ - [Swarm](http://swarm-guide.readthedocs.io/)
 
 ### IPFS
 
  > in-browser node ✅ 
+ > content-type support ❌ 
 
 ```javascript
 RifStorage(Provider.IPFS, ipfsOptions)
@@ -138,14 +139,15 @@ You can access the [js-ipfs-http-client] instance using `.ipfs` property of the 
 ### Swarm
 
  > in-browser node ❌ 
+ > content-type support ✅ 
 
 ```javascript
-RifStorage(Provider.SWARM, swarmOptions)
+RifStorage(Provider.SWARM, bzzOptions)
 ```
 
-`swarmOptions` are directly passed to [Erebos], hence check that for syntax and options.
-
-You can access the [Erebos]'s `api-bzz` instance using `.bzz` property of the `StorageProvider` object
+`bzzOptions` can be:
+ * `url?: string`: URL of the running Swarm node. If not specified than requests will be aimed to from which URL the script of served (in browser). Or it fails (in NodeJs).
+ * `timeout?: number | false`: number which specifies timeout period. Default value is `10000` (ms). If `false` then no timeout. 
 
 ## API
 
@@ -179,6 +181,7 @@ Directory represents directory structure where keys are paths and values is `Dir
 const directory = {
   'some/directory/with/file': {
     data: 'some string to store',
+    contentType: 'text/plain',
     size: 20
   }
 }
@@ -191,6 +194,7 @@ Used both for data input (eq. as part of [`Directory`] for `put()`) or when retr
 
  * `data` can be `string`, `Buffer`, `Readable`
  * `size?: number` can be left out except when `data` is `Readable`. Only applicable for Swarm.
+ * `contentType?: string` is applicable only for Swarm provider.
 
 ### [`DirectoryArray`] 
 
@@ -218,26 +222,26 @@ Interface implemented by IPFS and Swarm providers. Returned by [`factory()`](#fa
 
 #### [`StorageProvider.put(data, options) -> Promise<string>`](./docs/interfaces/_types_.storageprovider.md#put)
 
+Parameters:
+ * `data` - one of the following: 
+    * `string`, `Buffer`, `Readable` that represents single file
+    * [`Directory<string | Buffer | Readable>`](#directory-interface) | [`DirectoryArray<Buffer | Readable>`](#directoryarray)
+ * `options` - options passed to either IPFS's `add()` or Swarms `upload()` functions, they share:
+    * `fileName?: string` - applicable only for single files, see [note](#filenames) before
+ 
 ##### Filenames
 
 When you are adding single-file or buffer/string/readable you can specify file-name under which it should be stored, using
 the `options`. When you do that the original data are wrapped in folder in order to persist this information. Therefore
 when you `.get()` this address then the result will be [`Directory`](#directory-interface) of one file.
 
-Parameters:
- * `data` - one of the following: 
-    * `string`, `Buffer`, `Readable` that represents single file
-    * [`Directory<string | Buffer | Readable>`](#directory-interface) | [`DirectoryArray<Buffer | Readable>`](#directoryarray)
- * `options` - options passed to either IPFS's `add()` or Swarms `upload()` functions, they share:
-    * `filename?: string` - applicable only for single files, see [note](#filenames) before
- 
 #### [`StorageProvider.get(address, options) -> Promise<Directory<Buffer> | Buffer>`](./docs/interfaces/_types_.storageprovider.md#get)
 
 Retrieves data from provider's network.
 
 Parameters:
  * `address` - string hash or CID
- * `options` - options passed to either IPFS's `get()` or [Erebos]'s `download()` functions.
+ * `options` - options passed to either IPFS's `get()` or Swarm.
  
 Returns:
  * `Buffer` if the address was pointing to single raw file
@@ -260,7 +264,7 @@ Retrieves data from provider's network using streaming support.
 
 Parameters:
  * `address` - string hash or CID
- * `options` - options passed to either IPFS's `getReadable()` or [Erebos]'s `downloadStream()` functions.
+ * `options` - options passed to either IPFS's `getReadable()` or Swarm.
  
 Returns `Readable` in object mode that yields [`Entry`] objects with `Readable` as `data`.
 The `data` has to be fully processed before moving to next entry.
@@ -278,7 +282,6 @@ There are some ways you can make this module better:
 
 [js-ipfs-http-client]: https://github.com/ipfs/js-ipfs-http-client/
 [js-ipfs]: https://github.com/ipfs/js-ipfs
-[Erebos]: https://erebos.js.org/docs/api-bzz
 [`Provider`]: ./docs/enums/_types_.provider.md
 [`StorageProvider`]: ./docs/interfaces/_types_.storageprovider.md
 [`Directory`]: ./docs/modules/_types_.md#Directory

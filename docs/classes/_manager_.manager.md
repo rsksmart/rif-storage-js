@@ -67,7 +67,7 @@ console.log(storage.get(swarmHash).toString()) // Retrieves data from Swarm and 
 
 \+ **new Manager**(): *[Manager](_manager_.manager.md)*
 
-*Defined in [src/manager.ts:56](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/manager.ts#L56)*
+*Defined in [src/manager.ts:56](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/manager.ts#L56)*
 
 **Returns:** *[Manager](_manager_.manager.md)*
 
@@ -77,7 +77,7 @@ console.log(storage.get(swarmHash).toString()) // Retrieves data from Swarm and 
 
 • **get activeProvider**(): *[AllProviders](../modules/_types_.md#allproviders) | undefined*
 
-*Defined in [src/manager.ts:66](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/manager.ts#L66)*
+*Defined in [src/manager.ts:66](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/manager.ts#L66)*
 
 Returns the active provider
 
@@ -89,7 +89,7 @@ Returns the active provider
 
 ▸ **addProvider**(`type`: [Provider](../enums/_types_.provider.md), `options`: [ProviderOptions](../modules/_types_.md#provideroptions)): *void*
 
-*Defined in [src/manager.ts:79](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/manager.ts#L79)*
+*Defined in [src/manager.ts:79](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/manager.ts#L79)*
 
 Register new provider to be used by the Manager
 
@@ -112,7 +112,7 @@ ___
 
 ▸ **get**(`address`: string, `options?`: undefined | object): *Promise‹[Directory](../modules/_types_.md#directory)‹Buffer› | Buffer›*
 
-*Defined in [src/manager.ts:140](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/manager.ts#L140)*
+*Defined in [src/manager.ts:140](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/manager.ts#L140)*
 
 Retrieves data from provider.
 
@@ -140,7 +140,7 @@ ___
 
 ▸ **getReadable**(`address`: string, `options?`: undefined | object): *Promise‹Readable›*
 
-*Defined in [src/manager.ts:156](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/manager.ts#L156)*
+*Defined in [src/manager.ts:156](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/manager.ts#L156)*
 
 Retrieves data from provider.
 
@@ -168,7 +168,7 @@ ___
 
 ▸ **makeActive**(`name`: [Provider](../enums/_types_.provider.md)): *void*
 
-*Defined in [src/manager.ts:98](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/manager.ts#L98)*
+*Defined in [src/manager.ts:98](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/manager.ts#L98)*
 
 Specify active provider
 
@@ -188,7 +188,7 @@ ___
 
 ▸ **put**(`data`: string | Buffer | Readable, `options?`: undefined | object): *Promise‹string›*
 
-*Defined in [src/manager.ts:168](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/manager.ts#L168)*
+*Defined in [src/manager.ts:168](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/manager.ts#L168)*
 
 Puts data to provider.
 
@@ -207,7 +207,7 @@ Name | Type |
 
 ▸ **put**(`data`: [Directory](../modules/_types_.md#directory)‹string | Buffer | Readable› | Array‹[Entry](../modules/_types_.md#entry)‹Buffer | Readable››, `options?`: undefined | object): *Promise‹string›*
 
-*Defined in [src/manager.ts:169](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/manager.ts#L169)*
+*Defined in [src/manager.ts:169](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/manager.ts#L169)*
 
 **Parameters:**
 

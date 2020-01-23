@@ -14,7 +14,6 @@
 * [IpfsStorageProvider](../interfaces/_types_.ipfsstorageprovider.md)
 * [PutOptions](../interfaces/_types_.putoptions.md)
 * [StorageProvider](../interfaces/_types_.storageprovider.md)
-* [SwarmStorageProvider](../interfaces/_types_.swarmstorageprovider.md)
 
 ### Type aliases
 
@@ -25,6 +24,7 @@
 * [Entry](_types_.md#entry)
 * [ProviderOptions](_types_.md#provideroptions)
 * [PutInputs](_types_.md#putinputs)
+* [SwarmStorageProvider](_types_.md#swarmstorageprovider)
 
 ## Type aliases
 
@@ -32,15 +32,15 @@
 
 Ƭ **Address**: *string*
 
-*Defined in [src/types.ts:16](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L16)*
+*Defined in [src/types.ts:15](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L15)*
 
 ___
 
 ###  AllProviders
 
-Ƭ **AllProviders**: *[IpfsStorageProvider](../interfaces/_types_.ipfsstorageprovider.md) | [SwarmStorageProvider](../interfaces/_types_.swarmstorageprovider.md) | [Manager](../classes/_manager_.manager.md)*
+Ƭ **AllProviders**: *[IpfsStorageProvider](../interfaces/_types_.ipfsstorageprovider.md) | [SwarmStorageProvider](_types_.md#swarmstorageprovider) | [Manager](../classes/_manager_.manager.md)*
 
-*Defined in [src/types.ts:122](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L122)*
+*Defined in [src/types.ts:125](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L125)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 Ƭ **Directory**: *Record‹string, [DirectoryEntry](../interfaces/_types_.directoryentry.md)‹T››*
 
-*Defined in [src/types.ts:40](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L40)*
+*Defined in [src/types.ts:45](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L45)*
 
 Object that represents directory structure.
 Keys are paths and values are `DirectoryEntry` objects.
@@ -59,7 +59,7 @@ ___
 
 Ƭ **DirectoryArray**: *Array‹[Entry](_types_.md#entry)‹T››*
 
-*Defined in [src/types.ts:52](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L52)*
+*Defined in [src/types.ts:57](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L57)*
 
 Alternative data structure for representing directories. Used mainly together with streaming.
 
@@ -69,7 +69,7 @@ ___
 
 Ƭ **Entry**: *[DirectoryEntry](../interfaces/_types_.directoryentry.md)‹T› & object*
 
-*Defined in [src/types.ts:47](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L47)*
+*Defined in [src/types.ts:52](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L52)*
 
 Object representing single file.
 
@@ -79,9 +79,9 @@ ___
 
 ###  ProviderOptions
 
-Ƭ **ProviderOptions**: *IpfsClient | ClientOptions | BzzConfig*
+Ƭ **ProviderOptions**: *IpfsClient | ClientOptions | [BzzConfig](../interfaces/_swarm_mini_types_.bzzconfig.md)*
 
-*Defined in [src/types.ts:18](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L18)*
+*Defined in [src/types.ts:17](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L17)*
 
 ___
 
@@ -89,4 +89,12 @@ ___
 
 Ƭ **PutInputs**: *string | Buffer | Readable | [Directory](_types_.md#directory)‹string | Buffer | Readable› | [DirectoryArray](_types_.md#directoryarray)‹Buffer | Readable›*
 
-*Defined in [src/types.ts:54](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L54)*
+*Defined in [src/types.ts:59](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L59)*
+
+___
+
+###  SwarmStorageProvider
+
+Ƭ **SwarmStorageProvider**: *[StorageProvider](../interfaces/_types_.storageprovider.md)‹[Address](_types_.md#address), [DownloadOptions](_swarm_mini_types_.md#downloadoptions), [UploadOptions](../interfaces/_swarm_mini_types_.uploadoptions.md)›*
+
+*Defined in [src/types.ts:123](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L123)*

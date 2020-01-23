@@ -45,8 +45,8 @@ describe('IPFS provider', function () {
       expect(fetchedFromIpfs.content && fetchedFromIpfs.content.toString()).to.equal('hello world')
     })
 
-    it('should store file with filename', async () => {
-      const cid = await provider.put(Buffer.from('hello world'), { filename: 'some_file.pdf' })
+    it('should store file with fileName', async () => {
+      const cid = await provider.put(Buffer.from('hello world'), { fileName: 'some_file.pdf' })
 
       const result = await ipfs.get(cid)
       expect(result.length).to.eq(2)
@@ -171,7 +171,7 @@ describe('IPFS provider', function () {
     })
 
     it('should get named file as directory', async () => {
-      const cid = await provider.put(Buffer.from('hello world'), { filename: 'some_file.pdf' })
+      const cid = await provider.put(Buffer.from('hello world'), { fileName: 'some_file.pdf' })
 
       const fetchedFromIpfs = await provider.get(cid) as Directory<Buffer>
       expect(utils.isDirectory(fetchedFromIpfs), 'isDirectory fail').to.be.true()
