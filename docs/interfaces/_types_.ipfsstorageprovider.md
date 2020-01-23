@@ -27,7 +27,7 @@
 
 • **ipfs**: *IpfsClient*
 
-*Defined in [src/types.ts:115](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L115)*
+*Defined in [src/types.ts:120](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L120)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[type](_types_.storageprovider.md#type)*
 
-*Defined in [src/types.ts:72](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L72)*
+*Defined in [src/types.ts:77](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L77)*
 
 ## Methods
 
@@ -47,7 +47,7 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[get](_types_.storageprovider.md#get)*
 
-*Defined in [src/types.ts:87](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L87)*
+*Defined in [src/types.ts:92](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L92)*
 
 Retrieves data from provider's network.
 
@@ -76,7 +76,7 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[getReadable](_types_.storageprovider.md#getreadable)*
 
-*Defined in [src/types.ts:96](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L96)*
+*Defined in [src/types.ts:101](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L101)*
 
 Retrieves data from provider's network using streaming support.
 
@@ -99,7 +99,7 @@ ___
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[put](_types_.storageprovider.md#put)*
 
-*Defined in [src/types.ts:108](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L108)*
+*Defined in [src/types.ts:113](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L113)*
 
 Stores data on provider's network
 
@@ -117,17 +117,32 @@ Name | Type |
 
 Address of the stored data
 
-▸ **put**(`data`: [Directory](../modules/_types_.md#directory)‹string | Buffer | Readable› | [DirectoryArray](../modules/_types_.md#directoryarray)‹Buffer | Readable›, `options?`: PutOpts): *Promise‹CidAddress›*
+▸ **put**(`data`: [Directory](../modules/_types_.md#directory)‹string | Buffer | Readable›, `options?`: PutOpts): *Promise‹CidAddress›*
 
 *Inherited from [StorageProvider](_types_.storageprovider.md).[put](_types_.storageprovider.md#put)*
 
-*Defined in [src/types.ts:109](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L109)*
+*Defined in [src/types.ts:114](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L114)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`data` | [Directory](../modules/_types_.md#directory)‹string &#124; Buffer &#124; Readable› &#124; [DirectoryArray](../modules/_types_.md#directoryarray)‹Buffer &#124; Readable› |
+`data` | [Directory](../modules/_types_.md#directory)‹string &#124; Buffer &#124; Readable› |
+`options?` | PutOpts |
+
+**Returns:** *Promise‹CidAddress›*
+
+▸ **put**(`data`: [DirectoryArray](../modules/_types_.md#directoryarray)‹Buffer | Readable›, `options?`: PutOpts): *Promise‹CidAddress›*
+
+*Inherited from [StorageProvider](_types_.storageprovider.md).[put](_types_.storageprovider.md#put)*
+
+*Defined in [src/types.ts:115](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L115)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`data` | [DirectoryArray](../modules/_types_.md#directoryarray)‹Buffer &#124; Readable› |
 `options?` | PutOpts |
 
 **Returns:** *Promise‹CidAddress›*

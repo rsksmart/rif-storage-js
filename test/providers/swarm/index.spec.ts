@@ -26,7 +26,9 @@ describe('Swarm provider', () => {
     provider = swarmProvider({
       url: 'http://localhost:8500'
     })
-    bzz = provider.bzz
+    bzz = new Bzz({
+      url: 'http://localhost:8500'
+    })
 
     try {
       await bzz.upload('test')
@@ -49,7 +51,7 @@ describe('Swarm provider', () => {
     })
 
     it('should store file with filename', async () => {
-      const hash = await provider.put(Buffer.from('hello world'), { filename: 'some_file_name.pdf' })
+      const hash = await provider.put(Buffer.from('hello world'), { fileName: 'some_file_name.pdf' })
       log(`uploaded file ${hash}`)
       const listResult = await bzz.list(hash)
 
@@ -61,7 +63,6 @@ describe('Swarm provider', () => {
       expect(listResult.entries.length).to.eq(1)
       expect(listResult.entries[0]).to.include({
         path: 'some_file_name.pdf',
-        contentType: 'application/pdf',
         size: 11
       })
 
@@ -142,6 +143,34 @@ describe('Swarm provider', () => {
       log(`uploaded file ${hash}`)
 
       const result = await bzz.download(hash, { mode: 'raw' })
+      log(`downloaded file ${hash}`)
+
+      expect(await result.text()).to.equal('hello world')
+    })
+
+    it('should store readable file with filename', async () => {
+      const hash = await provider.put(createReadable('hello world'), {
+        fileName: 'nice_poem.txt',
+        contentType: 'text/plain',
+        size: 11
+      })
+      log(`uploaded file ${hash}`)
+
+      const listResult = await bzz.list(hash)
+
+      if (!listResult || !listResult.entries) {
+        throw new AssertionError('Entries are wrong!')
+      }
+
+      expect(listResult.entries).to.be.an('Array')
+      expect(listResult.entries.length).to.eq(1)
+      expect(listResult.entries[0]).to.include({
+        path: 'nice_poem.txt',
+        contentType: 'text/plain',
+        size: 11
+      })
+
+      const result = await bzz.download(listResult.entries[0].hash, { mode: 'raw' })
       log(`downloaded file ${hash}`)
 
       expect(await result.text()).to.equal('hello world')
@@ -231,7 +260,6 @@ describe('Swarm provider', () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(listResult.entries[0]).to.include({
         path: 'file.pdf',
-        contentType: 'application/pdf',
         size: 4
       })
 
@@ -284,8 +312,8 @@ describe('Swarm provider', () => {
 
     it('should get named file as directory', async () => {
       const hash = await provider.put(Buffer.from('hello world'), {
-        filename: 'some_file_name.pdf',
-        contentType: 'plain/text'
+        fileName: 'some_file_name.pdf',
+        contentType: 'text/plain'
       })
 
       const fetched = await provider.get(hash) as Directory<Buffer>
@@ -295,7 +323,7 @@ describe('Swarm provider', () => {
     })
 
     it('should get readable file', async () => {
-      const hash = (await bzz.uploadFile(Buffer.from('hello world'), { contentType: 'plain/text' }))
+      const hash = (await bzz.uploadFile(Buffer.from('hello world'), { contentType: 'text/plain' }))
 
       const stream = await provider.getReadable(hash)
       let count = 0

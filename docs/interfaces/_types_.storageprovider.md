@@ -18,8 +18,6 @@ Generic interface that every provider has to implement.
 
   ↳ [IpfsStorageProvider](_types_.ipfsstorageprovider.md)
 
-  ↳ [SwarmStorageProvider](_types_.swarmstorageprovider.md)
-
 ## Implemented by
 
 * [Manager](../classes/_manager_.manager.md)
@@ -42,7 +40,7 @@ Generic interface that every provider has to implement.
 
 • **type**: *[Provider](../enums/_types_.provider.md)*
 
-*Defined in [src/types.ts:72](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L72)*
+*Defined in [src/types.ts:77](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L77)*
 
 ## Methods
 
@@ -50,7 +48,7 @@ Generic interface that every provider has to implement.
 
 ▸ **get**(`address`: Addr, `options?`: GetOpts): *Promise‹[Directory](../modules/_types_.md#directory)‹Buffer› | Buffer›*
 
-*Defined in [src/types.ts:87](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L87)*
+*Defined in [src/types.ts:92](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L92)*
 
 Retrieves data from provider's network.
 
@@ -77,7 +75,7 @@ ___
 
 ▸ **getReadable**(`address`: Addr, `options?`: GetOpts): *Promise‹Readable›*
 
-*Defined in [src/types.ts:96](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L96)*
+*Defined in [src/types.ts:101](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L101)*
 
 Retrieves data from provider's network using streaming support.
 
@@ -98,7 +96,7 @@ ___
 
 ▸ **put**(`data`: string | Buffer | Readable, `options?`: PutOpts): *Promise‹Addr›*
 
-*Defined in [src/types.ts:108](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L108)*
+*Defined in [src/types.ts:113](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L113)*
 
 Stores data on provider's network
 
@@ -116,15 +114,28 @@ Name | Type |
 
 Address of the stored data
 
-▸ **put**(`data`: [Directory](../modules/_types_.md#directory)‹string | Buffer | Readable› | [DirectoryArray](../modules/_types_.md#directoryarray)‹Buffer | Readable›, `options?`: PutOpts): *Promise‹Addr›*
+▸ **put**(`data`: [Directory](../modules/_types_.md#directory)‹string | Buffer | Readable›, `options?`: PutOpts): *Promise‹Addr›*
 
-*Defined in [src/types.ts:109](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/types.ts#L109)*
+*Defined in [src/types.ts:114](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L114)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`data` | [Directory](../modules/_types_.md#directory)‹string &#124; Buffer &#124; Readable› &#124; [DirectoryArray](../modules/_types_.md#directoryarray)‹Buffer &#124; Readable› |
+`data` | [Directory](../modules/_types_.md#directory)‹string &#124; Buffer &#124; Readable› |
+`options?` | PutOpts |
+
+**Returns:** *Promise‹Addr›*
+
+▸ **put**(`data`: [DirectoryArray](../modules/_types_.md#directoryarray)‹Buffer | Readable›, `options?`: PutOpts): *Promise‹Addr›*
+
+*Defined in [src/types.ts:115](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/types.ts#L115)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`data` | [DirectoryArray](../modules/_types_.md#directoryarray)‹Buffer &#124; Readable› |
 `options?` | PutOpts |
 
 **Returns:** *Promise‹Addr›*

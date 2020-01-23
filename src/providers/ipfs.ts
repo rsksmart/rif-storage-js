@@ -111,7 +111,7 @@ function mapDataToIpfs<T> (data: Directory<T>): Array<IpfsObject<T>> {
  * @param options
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function put (this: IpfsStorageProvider, data: PutInputs, options?: RegularFiles.AddOptions & { filename?: string }): Promise<any> {
+async function put (this: IpfsStorageProvider, data: PutInputs, options?: RegularFiles.AddOptions & { fileName?: string }): Promise<any> {
   options = options || {}
 
   if (typeof data === 'string') {
@@ -123,8 +123,8 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: Regula
     const el = data[0]
     data = el.data
 
-    if (!options.filename && el.path) {
-      options.filename = el.path
+    if (!options.fileName && el.path) {
+      options.fileName = el.path
     }
   }
 
@@ -132,14 +132,14 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: Regula
     log('uploading single file')
     let dataToAdd: PutInputs | Array<IpfsObject<Buffer | Readable>>
 
-    if (options.filename) {
+    if (options.fileName) {
       dataToAdd = [
         {
           content: data as Buffer | Readable,
-          path: options.filename || ''
+          path: options.fileName || ''
         }
       ]
-      delete options.filename
+      delete options.fileName
       options.wrapWithDirectory = true
     } else {
       dataToAdd = data
@@ -156,8 +156,8 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: Regula
     throw new TypeError('data have to be string, Readable, Buffer, DirectoryArray or Directory object!')
   }
 
-  if (options.filename) {
-    throw new ValueError('You are uploading directory, yet you specified filename that is not applicable here!')
+  if (options.fileName) {
+    throw new ValueError('You are uploading directory, yet you specified fileName that is not applicable here!')
   }
 
   if ((Array.isArray(data) && data.length === 0) || Object.keys(data).length === 0) {

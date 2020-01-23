@@ -1,8 +1,7 @@
 import { IpfsClient, CidAddress, ClientOptions } from 'ipfs-http-client'
-import { Bzz } from '@erebos/api-bzz-node'
-import { BzzConfig } from '@erebos/api-bzz-base'
 import { Readable } from 'stream'
 import { Manager } from './manager'
+import { BzzConfig, DownloadOptions, UploadOptions } from './swarm-mini'
 
 /**
  * Enum of supported providers.
@@ -25,6 +24,12 @@ export type ProviderOptions = IpfsClient | ClientOptions | BzzConfig
  */
 export interface DirectoryEntry<T> {
   data: T
+
+  /**
+   * Applicable only for Swarm provider.
+   * When left undefined than the data are stored as `raw`.
+   */
+  contentType?: string
 
   /**
    * Applicable mainly for Swarm provider.
@@ -62,7 +67,7 @@ export type PutInputs =
  * Common options for all providers for the .put() method.
  */
 export interface PutOptions {
-  filename?: string
+  fileName?: string
 }
 
 /**
@@ -106,17 +111,15 @@ export interface StorageProvider<Addr, GetOpts, PutOpts extends PutOptions> {
    * @return Address of the stored data
    */
   put (data: string | Buffer | Readable, options?: PutOpts): Promise<Addr>
-  put (data: Directory<string | Buffer | Readable> | DirectoryArray<Buffer | Readable>, options?: PutOpts): Promise<Addr>
+  put (data: Directory<string | Buffer | Readable>, options?: PutOpts): Promise<Addr>
+  put (data: DirectoryArray<Buffer | Readable>, options?: PutOpts): Promise<Addr>
 }
 
-// TODO: Add proper options definitions
 export interface IpfsStorageProvider
   extends StorageProvider<CidAddress, object, object> {
   readonly ipfs: IpfsClient
 }
 
-export interface SwarmStorageProvider extends StorageProvider<Address, object, object> {
-  readonly bzz: Bzz
-}
+export type SwarmStorageProvider = StorageProvider<Address, DownloadOptions, UploadOptions>
 
 export type AllProviders = IpfsStorageProvider | SwarmStorageProvider | Manager

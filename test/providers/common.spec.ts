@@ -91,7 +91,7 @@ describe('Common providers tests', () => {
 
       describe('integration tests', () => {
         it('should wrap files with metadata in directory', async function () {
-          const hash = await provider.put(Buffer.from('hello world'), { filename: 'poem.txt' }) as string
+          const hash = await provider.put(Buffer.from('hello world'), { fileName: 'poem.txt' }) as string
           const fetched = await provider.get(hash) as Directory<Buffer>
 
           expect(utils.isDirectory(fetched)).to.be.true()

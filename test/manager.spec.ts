@@ -7,8 +7,8 @@ import chai from 'chai'
 import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ProviderError, ValueError } from '../src/errors'
-import { Bzz } from '@erebos/api-bzz-node'
 import { streamToString } from './utils'
+import { Bzz } from '@erebos/api-bzz-node'
 
 // Do not reorder these statements - https://github.com/chaijs/chai/issues/1298
 chai.use(chaiAsPromised)
@@ -26,9 +26,9 @@ describe('manager', function () {
     ipfs = await factory.setup()
     teardown = factory.teardown
 
-    bzz = swarmProvider({
+    bzz = new Bzz({
       url: 'http://localhost:8500'
-    }).bzz
+    })
   })
 
   after(() => {

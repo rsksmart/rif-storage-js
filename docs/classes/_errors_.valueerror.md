@@ -32,7 +32,7 @@ General error for any problems related to passed value that is not related to it
 
 *Overrides [RdsError](_errors_.rdserror.md).[constructor](_errors_.rdserror.md#constructor)*
 
-*Defined in [src/errors.ts:18](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/errors.ts#L18)*
+*Defined in [src/errors.ts:18](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/errors.ts#L18)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ Name | Type |
 
 • **message**: *string*
 
-*Inherited from void*
+*Inherited from [RdsError](_errors_.rdserror.md).[message](_errors_.rdserror.md#message)*
 
 Defined in node_modules/typescript/lib/lib.es5.d.ts:974
 
@@ -58,7 +58,7 @@ ___
 
 • **name**: *string*
 
-*Inherited from void*
+*Inherited from [RdsError](_errors_.rdserror.md).[name](_errors_.rdserror.md#name)*
 
 Defined in node_modules/typescript/lib/lib.es5.d.ts:973
 
@@ -68,9 +68,7 @@ ___
 
 • **stack**? : *undefined | string*
 
-*Inherited from void*
-
-*Overrides void*
+*Inherited from [RdsError](_errors_.rdserror.md).[stack](_errors_.rdserror.md#optional-stack)*
 
 Defined in node_modules/typescript/lib/lib.es5.d.ts:975
 
@@ -82,4 +80,4 @@ ___
 
 *Overrides [RdsError](_errors_.rdserror.md).[code](_errors_.rdserror.md#static-code)*
 
-*Defined in [src/errors.ts:18](https://github.com/rsksmart/rds-libjs/blob/813b1b1/src/errors.ts#L18)*
+*Defined in [src/errors.ts:18](https://github.com/rsksmart/rds-libjs/blob/5474bd0/src/errors.ts#L18)*
