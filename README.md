@@ -13,6 +13,8 @@
 
 > Client library integrating distributed storage projects  
 
+**Warning: This project is in alpha state. There might (and most probably will) be changes in the future to its API and working. Also, no guarantees can be made about its stability, efficiency, and security at this stage.**
+
 ## Table of Contents
 
 - [Install](#install)
@@ -121,7 +123,7 @@ This library integrates several (decentralized) storage providers, currently sup
 
 ### IPFS
 
- > in-browser node ✅ 
+ > in-browser node ✅ <br>
  > content-type support ❌ 
 
 ```javascript
@@ -138,7 +140,7 @@ You can access the [js-ipfs-http-client] instance using `.ipfs` property of the 
 
 ### Swarm
 
- > in-browser node ❌ 
+ > in-browser node ❌ <br>
  > content-type support ✅ 
 
 ```javascript

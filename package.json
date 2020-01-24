@@ -19,6 +19,7 @@
   ],
   "main": "lib/index.js",
   "browser": {
+    "./lib/swarm-mini/utils/data.js": "./lib/swarm-mini/utils/data.browser.js",
     "./src/swarm-mini/utils/data.ts": "./src/swarm-mini/utils/data.browser.ts",
     "stream": "readable-stream",
     "@erebos/api-bzz-node": "@erebos/api-bzz-browser"
