@@ -46,7 +46,7 @@
     "debug": "^4.1.0",
     "form-data": "^3.0.0",
     "ipfs-http-client": "^41.0.1",
-    "ky": "^0.16.2",
+    "ky": "^0.19.0",
     "ky-universal": "^0.3.0",
     "multiaddr": "^7.2.1",
     "readable-stream": "^3.5.0",
