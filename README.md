@@ -1,6 +1,8 @@
 # RIF Storage.js
 
 [![CircleCI](https://flat.badgen.net/circleci/github/rsksmart/rif-storage-js/master)](https://circleci.com/gh/rsksmart/rif-storage-js/)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=rsksmart_rif-storage-js&metric=alert_status)](https://sonarcloud.io/dashboard/index/rsksmart_rif-storage-js)
+[![SonarCloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=rsksmart_rif-storage-js&metric=coverage)](https://sonarcloud.io/component_measures/metric/coverage/list?id=rsksmart_rif-storage-js)
 [![Dependency Status](https://david-dm.org/rsksmart/rif-storage-js.svg?style=flat-square)](https://david-dm.org/rsksmart/rif-storage-js)
 [![](https://img.shields.io/badge/made%20by-IOVLabs-blue.svg?style=flat-square)](http://iovlabs.org)
 [![](https://img.shields.io/badge/project-RIF%20Storage-blue.svg?style=flat-square)](https://www.rifos.org/)
