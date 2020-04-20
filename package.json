@@ -64,7 +64,7 @@
     "@types/node-fetch": "^2.5.4",
     "@types/pull-stream": "^3.6.0",
     "@types/readable-stream": "^2.3.5",
-    "@types/tar-stream": "^1.6.1",
+    "@types/tar-stream": "^2.1.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dirty-chai": "^2.0.1",
