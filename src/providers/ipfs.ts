@@ -161,7 +161,7 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: Regula
   }
 
   if ((Array.isArray(data) && data.length === 0) || Object.keys(data).length === 0) {
-    // TODO: [Q] Empty object should throw error? If not then what to return? https://github.com/rsksmart/rds-libjs/issues/4
+    // TODO: [Q] Empty object should throw error? If not then what to return? https://github.com/rsksmart/rif-storage-js/issues/4
     throw new ValueError('You passed empty Directory')
   }
 
