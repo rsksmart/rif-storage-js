@@ -68,7 +68,7 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dirty-chai": "^2.0.1",
-    "ipfs": "^0.40.0",
+    "ipfs": "^0.43.3",
     "ipfsd-ctl": "^0.47.4",
     "merge-options": "^2.0.0",
     "sinon": "^8.1.1",
