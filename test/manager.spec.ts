@@ -1,7 +1,7 @@
 import { IpfsClient } from 'ipfs-http-client'
 import createIpfs from './providers/ipfs/utils'
 import { Manager } from '../src/manager'
-import { Provider, swarm as swarmProvider } from '../src'
+import { Provider } from '../src'
 
 import chai from 'chai'
 import dirtyChai from 'dirty-chai'
@@ -18,7 +18,7 @@ const expect = chai.expect
 describe('manager', function () {
   let bzz: Bzz
   let ipfs: IpfsClient
-  let teardown: () => Promise<void[]>
+  let teardown: () => Promise<void>
   this.timeout(10 * 1000)
 
   before(async () => {

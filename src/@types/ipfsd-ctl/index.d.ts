@@ -20,6 +20,7 @@ declare module 'ipfsd-ctl' {
     remote?: boolean
     port?: number
     exec?: string
+    ipfsOptions?: object
     IpfsClient?: object
   }
 
@@ -49,7 +50,7 @@ declare module 'ipfsd-ctl' {
   }
 
   // TODO: Not completely true
-  type ProcOptions = FactoryOptions & SpawnOptions
+  type ControllerOptions = FactoryOptions & SpawnOptions
 
   export class Factory {
     constructor (options: FactoryOptions);
@@ -66,11 +67,11 @@ declare module 'ipfsd-ctl' {
      */
     version (options: SpawnOptions): Promise<number>
 
-    spawn (options: SpawnOptions): Promise<Proc>
+    spawn (options: SpawnOptions): Promise<Controller>
   }
 
-  export class Proc {
-    constructor (opts: ProcOptions);
+  export class Controller {
+    constructor (opts: ControllerOptions);
 
     /**
      * Get the current repo path
@@ -101,7 +102,7 @@ declare module 'ipfsd-ctl' {
       bits?: number
       directory?: string
       pass?: string
-    }): Promise<Proc>;
+    }): Promise<Controller>;
 
     /**
      * Delete the repo that was being used.
@@ -195,5 +196,7 @@ declare module 'ipfsd-ctl' {
 
   export function createServer (options: { port: number } | number): Server;
 
-  export function create (options: FactoryOptions): Factory;
+  export function createFactory (options: FactoryOptions): Factory;
+
+  export function createController (options: ControllerOptions): Promise<Controller>
 }

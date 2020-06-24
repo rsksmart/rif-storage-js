@@ -18,7 +18,7 @@ const expect = chai.expect
 describe('IPFS provider', function () {
   let ipfs: IpfsClient
   let provider: IpfsStorageProvider
-  let teardown: () => Promise<void[]>
+  let teardown: () => Promise<void>
   this.timeout(10 * 1000)
 
   before(async () => {
