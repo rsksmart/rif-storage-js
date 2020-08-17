@@ -71,7 +71,7 @@
     "ipfs": "^0.40.0",
     "ipfsd-ctl": "^0.47.4",
     "merge-options": "^2.0.0",
-    "sinon": "^8.1.1",
+    "sinon": "^9.0.3",
     "tasegir": "^1.6.0",
     "typedoc": "^0.17.4",
     "typedoc-plugin-markdown": "^2.2.16"
