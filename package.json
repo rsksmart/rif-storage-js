@@ -73,7 +73,7 @@
     "merge-options": "^2.0.0",
     "sinon": "^8.1.1",
     "tasegir": "^1.6.0",
-    "typedoc": "^0.17.4",
+    "typedoc": "^0.19.1",
     "typedoc-plugin-markdown": "^2.2.16"
   },
   "engines": {
