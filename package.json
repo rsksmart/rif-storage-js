@@ -42,7 +42,7 @@
     "test:browser": "tasegir test --target browser --target webworker"
   },
   "dependencies": {
-    "cids": "^0.8.0",
+    "cids": "^1.1.5",
     "debug": "^4.1.0",
     "form-data": "^3.0.0",
     "ipfs-http-client": "^44.0.3",
