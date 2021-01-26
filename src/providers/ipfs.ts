@@ -1,21 +1,33 @@
-import { Directory, IpfsStorageProvider, Provider, PutInputs } from '../types'
-import ipfs, {
-  CidAddress,
-  ClientOptions,
-  IpfsClient,
-  IpfsObject,
-  RegularFiles
-} from 'ipfs-http-client'
+import asyncIterToStream from 'async-iterator-to-stream'
 import CID from 'cids'
-import { ValueError } from '../errors'
-import { isTSDirectory, isTSDirectoryArray, markDirectory, markFile, isReadable, isReadableOrBuffer } from '../utils'
 import debug from 'debug'
 import { Readable, Transform } from 'stream'
 
+import ipfs, { HttpOptions } from 'ipfs-http-client'
+import type { ClientOptions } from 'ipfs-http-client/src/lib/core'
+import type { ToFile, ToContent, File as IPFSFile, IPFSEntry } from 'ipfs-core-types/src/files'
+import type { AddAllOptions, GetOptions as RootGetOptions } from 'ipfs-core-types/src/root'
+
+import { Provider } from '../definitions'
+import type { Directory, Ipfs, IpfsStorageProvider, PutInputs } from '../definitions'
+import { ValueError } from '../errors'
+import {
+  isTSDirectory,
+  isTSDirectoryArray,
+  markDirectory,
+  markFile,
+  isReadable,
+  isReadableOrBuffer,
+  lastAsyncIterItem, arrayFromAsyncIter
+} from '../utils'
+
 const log = debug('rds:ipfs')
 
-function isIpfs (client: IpfsClient | ClientOptions): client is IpfsClient {
-  client = client as IpfsClient
+type AddOptions = AddAllOptions & HttpOptions
+type GetOptions = RootGetOptions & HttpOptions
+
+function isIpfs (client: Ipfs | ClientOptions): client is Ipfs {
+  client = client as Ipfs
   return typeof client.get === 'function' && typeof client.add === 'function'
 }
 
@@ -26,7 +38,7 @@ function isIpfs (client: IpfsClient | ClientOptions): client is IpfsClient {
  * @throws ValueError if address is not valid
  * @param address
  */
-function validateAddress (address: unknown): address is CidAddress {
+function validateAddress (address: unknown): address is CID {
   const isAddress = typeof address === 'string' || CID.isCID(address) || Buffer.isBuffer(address)
 
   if (!isAddress) {
@@ -34,6 +46,11 @@ function validateAddress (address: unknown): address is CidAddress {
   }
 
   return true
+}
+
+async function contentToBuffer (iter: AsyncIterable<Uint8Array>): Promise<Buffer> {
+  const arrs = await arrayFromAsyncIter(iter)
+  return Buffer.concat(arrs)
 }
 
 /**
@@ -57,17 +74,25 @@ function validateAddress (address: unknown): address is CidAddress {
  * @param data - IPFS data returned from ipfs.get()
  * @param originalAddress - Original CID address that is supposed to be removed from path
  */
-function mapDataFromIpfs<T extends { length?: number }> (data: Array<IpfsObject<T>>, originalAddress: CidAddress): Directory<T> {
-  return data.reduce<Directory<T>>((directory: Directory<T>, file: IpfsObject<T>): Directory<T> => {
-    // TODO: [Q] What about empty directories? Currently ignored
-    if (!file.content) return directory
+async function mapDataFromIpfs (data: Array<IPFSEntry>, originalAddress: CID | string): Promise<Directory<Buffer>> {
+  const result: Directory<Buffer> = {}
 
-    directory[file.path.replace(originalAddress.toString() + '/', '')] = {
-      data: file.content,
-      size: file.content.length
+  for (const entry of data) {
+    // TODO: [Q] What about directories? Currently ignored
+    if (entry.type === 'dir') continue
+
+    if (!entry.content) {
+      throw new Error('File did not have any content returned from IPFS Client!')
     }
-    return directory
-  }, {})
+
+    const content = await contentToBuffer(entry.content)
+    result[entry.path.replace(originalAddress.toString() + '/', '')] = {
+      data: content,
+      size: content.length
+    }
+  }
+
+  return result
 }
 
 /**
@@ -90,7 +115,7 @@ function mapDataFromIpfs<T extends { length?: number }> (data: Array<IpfsObject<
  * @param data - Directory data
  * @return Array of objects that is consumable using ipfs.add()
  */
-function mapDataToIpfs<T> (data: Directory<T>): Array<IpfsObject<T>> {
+function mapDataToIpfs (data: Directory<ToContent>): Array<ToFile> {
   return Object.entries(data).map(([path, entry]) => {
     if (path === '') {
       throw new ValueError('Empty path (name of property) is not allowed!')
@@ -111,7 +136,7 @@ function mapDataToIpfs<T> (data: Directory<T>): Array<IpfsObject<T>> {
  * @param options
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function put (this: IpfsStorageProvider, data: PutInputs, options?: RegularFiles.AddOptions & { fileName?: string }): Promise<any> {
+async function put (this: IpfsStorageProvider, data: PutInputs, options?: AddOptions & { fileName?: string }): Promise<string> {
   options = options || {}
 
   if (typeof data === 'string') {
@@ -130,23 +155,21 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: Regula
 
   if (Buffer.isBuffer(data) || isReadable(data as Readable)) {
     log('uploading single file')
-    let dataToAdd: PutInputs | Array<IpfsObject<Buffer | Readable>>
+    let dataToAdd: PutInputs | ToFile
 
     if (options.fileName) {
-      dataToAdd = [
-        {
-          content: data as Buffer | Readable,
-          path: options.fileName || ''
-        }
-      ]
+      dataToAdd = {
+        content: data as Buffer | Readable,
+        path: options.fileName || ''
+      }
       delete options.fileName
       options.wrapWithDirectory = true
     } else {
       dataToAdd = data
     }
 
-    const result = (await this.ipfs.add(dataToAdd as Buffer | Readable, options))
-    return result[result.length - 1].hash
+    const result = await this.ipfs.add(dataToAdd as Buffer | Readable, options)
+    return result.cid.toString()
   }
 
   log('uploading directory')
@@ -165,22 +188,28 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: Regula
     throw new ValueError('You passed empty Directory')
   }
 
+  let mappedData
+
   if (isTSDirectory<Buffer | Readable>(data, isReadableOrBuffer)) {
-    const mappedData = mapDataToIpfs<Buffer | Readable>(data)
-    const results = await this.ipfs.add(mappedData, options)
-    return results[results.length - 1].hash
+    mappedData = mapDataToIpfs(data)
   } else if (isTSDirectoryArray<Buffer | Readable>(data, isReadableOrBuffer)) {
-    const mappedData = data.map(entry => {
+    mappedData = data.map(entry => {
       return {
         content: entry.data,
         path: entry.path
       }
-    }) as Array<IpfsObject<Buffer | Readable>>
-    const results = await this.ipfs.add(mappedData, options)
-    return results[results.length - 1].hash
+    }) as Array<ToFile>
   } else {
     throw new ValueError('data have to be string, Readable, Buffer, DirectoryArray<Buffer | Readable> or Directory<Buffer | Readable> object!')
   }
+
+  const last = await lastAsyncIterItem(this.ipfs.addAll(mappedData, options))
+
+  if (!last) {
+    throw new Error('No data were returned from IPFS client.')
+  }
+
+  return last.cid.toString()
 }
 
 /**
@@ -190,26 +219,26 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: Regula
  * @param address - CID compatible address
  * @param options
  */
-async function get (this: IpfsStorageProvider, address: CidAddress, options?: RegularFiles.GetOptions): Promise<Directory<Buffer> | Buffer> {
+async function get (this: IpfsStorageProvider, address: CID | string, options?: GetOptions): Promise<Directory<Buffer> | Buffer> {
   validateAddress(address)
 
-  const result = await this.ipfs.get(address, options)
+  const result = await arrayFromAsyncIter(this.ipfs.get(address, options))
 
-  // `result[0].content === undefined` means that downloaded empty directory
-  if (result.length > 1 || result[0].content === undefined) {
+  // Generally process directory when there is more then one
+  // entry, but the first and only entry can be empty directory.
+  if (result.length >= 2 || result[0].type === 'dir') {
     log(`fetching directory from ${address}`)
-    return markDirectory(mapDataFromIpfs(result, address))
+    return markDirectory(await mapDataFromIpfs(result, address))
   }
 
-  const file = result[0]
-
-  // Empty content means it is an empty folder
-  if (!file.content) {
-    return markDirectory({})
-  }
-
+  const file = result[0] as IPFSFile
   log(`fetching single file from ${address}`)
-  return markFile(file.content)
+
+  if (!file.content) {
+    throw new Error('File did not have any content returned from IPFS Client!')
+  }
+
+  return markFile(await contentToBuffer(file.content))
 }
 
 /**
@@ -221,37 +250,35 @@ async function get (this: IpfsStorageProvider, address: CidAddress, options?: Re
  * @see Storage#getReadable
  */
 // eslint-disable-next-line require-await
-async function getReadable (this: IpfsStorageProvider, address: CidAddress, options?: RegularFiles.GetOptions): Promise<Readable> {
+async function getReadable (this: IpfsStorageProvider, address: CID, options?: GetOptions): Promise<Readable> {
   validateAddress(address)
 
   const trans = new Transform({
     objectMode: true,
-    transform (chunk: IpfsObject<Readable>, encoding: string, callback: (error?: (Error | null), data?: any) => void): void {
-      // We ignore folders, returning only files
-      if (!chunk.content) {
+    transform (entry: IPFSEntry, encoding: string, callback: (error?: (Error | null), data?: any) => void): void {
+      if (entry.type === 'dir') {
         callback(null, null)
       } else {
         let pathWithoutRootHash
 
-        if (chunk.path.includes('/')) {
-          const splittedPath = chunk.path.split('/')
+        if (entry.path.includes('/')) {
+          const splittedPath = entry.path.split('/')
           pathWithoutRootHash = splittedPath.slice(1).join('/')
         } else { // Should be root
           pathWithoutRootHash = '/'
         }
 
-        // eslint-disable-next-line standard/no-callback-literal
         callback(
           null,
           {
             path: pathWithoutRootHash,
-            data: chunk.content
+            data: asyncIterToStream(entry.content!)
           })
       }
     }
   })
-  this.ipfs.getReadableStream(address, options).pipe(trans)
 
+  asyncIterToStream.obj(this.ipfs.get(address, options)).pipe(trans)
   return trans
 }
 
@@ -261,14 +288,14 @@ async function getReadable (this: IpfsStorageProvider, address: CidAddress, opti
  * @param options
  * @constructor
  */
-export default function IpfsFactory (options: ClientOptions | IpfsClient): IpfsStorageProvider {
-  let ipfsClient: IpfsClient
+export default function IpfsFactory (options: ClientOptions | Ipfs): IpfsStorageProvider {
+  let ipfsClient: Ipfs
 
   if (isIpfs(options)) {
     ipfsClient = options
     log('ipfs client using an embedded node')
   } else {
-    ipfsClient = ipfs(options)
+    ipfsClient = ipfs(options) as unknown as Ipfs
 
     const addr = typeof options === 'string' ? options : options.host
     log('ipfs client using http api to ', addr)

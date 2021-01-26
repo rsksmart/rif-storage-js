@@ -1,14 +1,14 @@
-import { IpfsClient } from 'ipfs-http-client'
 import createIpfs from './providers/ipfs/utils'
 import { Manager } from '../src/manager'
-import { Provider } from '../src'
+import { Ipfs, Provider } from '../src'
 
 import chai from 'chai'
 import dirtyChai from 'dirty-chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ProviderError, ValueError } from '../src/errors'
-import { streamToString } from './utils'
+import { asyncIteratorToString, getFileEntry, streamToString } from './utils'
 import { Bzz } from '@erebos/api-bzz-node'
+import { arrayFromAsyncIter } from '../src/utils'
 
 // Do not reorder these statements - https://github.com/chaijs/chai/issues/1298
 chai.use(chaiAsPromised)
@@ -17,13 +17,13 @@ const expect = chai.expect
 
 describe('manager', function () {
   let bzz: Bzz
-  let ipfs: IpfsClient
+  let ipfs: Ipfs
   let teardown: () => Promise<void>
   this.timeout(10 * 1000)
 
   before(async () => {
-    const factory = createIpfs()
-    ipfs = await factory.setup()
+    const factory = await createIpfs()
+    ipfs = await factory.ipfs as unknown as Ipfs
     teardown = factory.teardown
 
     bzz = new Bzz({
@@ -95,10 +95,10 @@ describe('manager', function () {
 
     const cid = await manager.put('hello world')
 
-    const result = await ipfs.get(cid)
-    const fetchedFromIpfs = result[0]
+    const result = await arrayFromAsyncIter(ipfs.get(cid))
+    const fetchedFromIpfs = getFileEntry(result[0])
     expect(fetchedFromIpfs.path).to.equal(cid)
-    expect(fetchedFromIpfs.content && fetchedFromIpfs.content.toString()).to.equal('hello world')
+    expect(await asyncIteratorToString(fetchedFromIpfs.content)).to.equal('hello world')
   })
 
   it('should put data to correct providers', async function () {
@@ -110,10 +110,10 @@ describe('manager', function () {
 
     const cid = await manager.put('hello world')
 
-    const ipfsResult = await ipfs.get(cid)
-    const fetchedFromIpfs = ipfsResult[0]
+    const ipfsResult = await arrayFromAsyncIter(ipfs.get(cid))
+    const fetchedFromIpfs = getFileEntry(ipfsResult[0])
     expect(fetchedFromIpfs.path).to.equal(cid)
-    expect(fetchedFromIpfs.content && fetchedFromIpfs.content.toString()).to.equal('hello world')
+    expect(await asyncIteratorToString(fetchedFromIpfs.content)).to.equal('hello world')
 
     manager.makeActive(Provider.SWARM)
     const hash = await manager.put('hello world')

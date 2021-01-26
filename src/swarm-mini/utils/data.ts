@@ -1,5 +1,5 @@
 import FormData from 'form-data'
-import { Directory } from '../../types'
+import { Directory } from '../../definitions'
 import { Readable } from 'stream'
 import { isReadable } from '../../utils'
 

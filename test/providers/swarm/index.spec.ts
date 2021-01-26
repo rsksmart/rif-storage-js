@@ -1,5 +1,5 @@
 import { swarm as swarmProvider } from '../../../src'
-import { Directory, Entry, SwarmStorageProvider } from '../../../src/types'
+import { Directory, Entry, SwarmStorageProvider } from '../../../src/definitions'
 import { Bzz } from '@erebos/api-bzz-node'
 import * as utils from '../../../src/utils'
 import debug from 'debug'

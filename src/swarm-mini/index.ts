@@ -12,7 +12,7 @@ import {
   ListResult,
   UploadOptions
 } from './types'
-import { Directory, DirectoryArray } from '../types'
+import { Directory, DirectoryArray, DirectoryEntry } from '../definitions'
 import { ValueError } from '../errors'
 import { isReadable, isReadableOrBuffer, isTSDirectory, isTSDirectoryArray, markDirectory, markFile } from '../utils'
 import prepareData from './utils/data'
@@ -71,8 +71,11 @@ function mapDirectoryArrayToDirectory<T> (data: DirectoryArray<T>): Directory<T>
     }
 
     const path: string = currentValue.path
-    delete currentValue.path
-    previousValue[path] = currentValue
+    previousValue[path] = {
+      contentType: currentValue.contentType,
+      data: currentValue.data,
+      size: currentValue.size
+    }
     return previousValue
   }, {})
 }

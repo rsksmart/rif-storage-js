@@ -1,7 +1,7 @@
 import ipfs from './providers/ipfs'
 import swarm from './providers/swarm'
-import { Provider, ProviderOptions, IpfsStorageProvider, SwarmStorageProvider } from './types'
-import { ClientOptions, IpfsClient } from 'ipfs-http-client'
+import { Provider, ProviderOptions, IpfsStorageProvider, SwarmStorageProvider, Ipfs } from './definitions'
+import type { ClientOptions } from 'ipfs-http-client/src/lib/core'
 import { Manager } from './manager'
 import { BzzConfig } from './swarm-mini'
 
@@ -19,7 +19,7 @@ function factory (provider: Provider, options: ProviderOptions): IpfsStorageProv
 
   switch (provider) {
     case Provider.IPFS:
-      return ipfs(options as ClientOptions | IpfsClient)
+      return ipfs(options as ClientOptions | Ipfs)
     case Provider.SWARM:
       return swarm(options as BzzConfig)
     case Provider.MANAGER: // returns Local Storage StorageProvider's implementation
@@ -33,4 +33,4 @@ export default factory
 export { Manager }
 export { ipfs, swarm }
 export { isFile, isDirectory } from './utils'
-export * from './types'
+export * from './definitions'

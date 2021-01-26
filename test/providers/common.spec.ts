@@ -1,6 +1,6 @@
-import { ipfs as ipfsProvider, swarm as swarmProvider } from '../../src'
+import { Ipfs, ipfs as ipfsProvider, swarm as swarmProvider } from '../../src'
 import createIpfs from './ipfs/utils'
-import { Directory, IpfsStorageProvider, SwarmStorageProvider } from '../../src/types'
+import { Directory, IpfsStorageProvider, SwarmStorageProvider } from '../../src/definitions'
 import { ValueError } from '../../src/errors'
 
 import chai from 'chai'
@@ -16,10 +16,8 @@ const expect = chai.expect
 
 const PROVIDERS = {
   async ipfs (): Promise<[IpfsStorageProvider, () => void]> {
-    const factory = createIpfs()
-    const ipfs = await factory.setup()
-    const teardown = factory.teardown
-    return [ipfsProvider(ipfs), teardown]
+    const factory = await createIpfs()
+    return [ipfsProvider(factory.ipfs as unknown as Ipfs), factory.teardown]
   },
   swarm (): Promise<[SwarmStorageProvider, () => void]> {
     // eslint-disable-next-line @typescript-eslint/no-empty-function

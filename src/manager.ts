@@ -6,7 +6,7 @@ import {
   ProviderOptions,
   Provider,
   StorageProvider
-} from './types'
+} from './definitions'
 import { Readable } from 'stream'
 import factory from './index'
 import { ProviderError, ValueError } from './errors'

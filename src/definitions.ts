@@ -1,7 +1,9 @@
-import { IpfsClient, CidAddress, ClientOptions } from 'ipfs-http-client'
+import { RootAPI as IPFS } from 'ipfs-core-types'
+import type { ClientOptions } from 'ipfs-http-client/src/lib/core'
 import { Readable } from 'stream'
 import { Manager } from './manager'
 import { BzzConfig, DownloadOptions, UploadOptions } from './swarm-mini'
+import CID from 'cids'
 
 /**
  * Enum of supported providers.
@@ -14,7 +16,8 @@ export enum Provider {
 
 export type Address = string
 
-export type ProviderOptions = IpfsClient | ClientOptions | BzzConfig
+export type Ipfs = IPFS
+export type ProviderOptions = Ipfs | ClientOptions | BzzConfig
 
 /**
  * Object represents a file and some of its metadata in [[Directory]] object.
@@ -116,8 +119,8 @@ export interface StorageProvider<Addr, GetOpts, PutOpts extends PutOptions> {
 }
 
 export interface IpfsStorageProvider
-  extends StorageProvider<CidAddress, object, object> {
-  readonly ipfs: IpfsClient
+  extends StorageProvider<CID | string, object, object> {
+  readonly ipfs: Ipfs
 }
 
 export type SwarmStorageProvider = StorageProvider<Address, DownloadOptions, UploadOptions>
