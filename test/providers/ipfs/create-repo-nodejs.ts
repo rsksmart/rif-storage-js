@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-ignore: No types yet
 import IPFSRepo from 'ipfs-repo'
 import os from 'os'
 import path from 'path'

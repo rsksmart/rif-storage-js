@@ -328,9 +328,7 @@ export class Bzz {
     const url = getUploadURL(options)
 
     try {
-      // AuHau: In NodeJS ky = node_fetch which supports Buffer and Readable, but ky uses browser's definitions, so
-      // ignoring it for compatibilities. Suggestions how to improve this will be welcomed.
-      // @ts-ignore
+      // @ts-ignore: In NodeJS ky = node_fetch which supports Buffer and Readable, but ky uses browser's definitions, so ignoring it for compatibilities. Suggestions how to improve this will be welcomed.
       return (await this.ky.post(url, { body: await prepareData(data), headers: options.headers })).text()
     } catch (e) {
       if (e.response) {

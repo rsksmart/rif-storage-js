@@ -1,9 +1,9 @@
 /* global self */
-// @ts-ignore
+// @ts-ignore: No types yet
 import IPFSRepo from 'ipfs-repo'
 import { nanoid } from 'nanoid'
 
-// @ts-ignore
+// @ts-ignore: Browser types
 const idb = self.indexedDB || self.mozIndexedDB || self.webkitIndexedDB || self.msIndexedDB
 
 export default function createTempRepo (repoPath?: string): any {

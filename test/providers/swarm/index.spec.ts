@@ -87,7 +87,6 @@ describe('Swarm provider', () => {
       log(`downloaded directory ${result}`)
       expect(Object.keys(result).length).to.eq(2)
 
-      // @ts-ignore
       Object.values(result).forEach(entry => entry.data && expect(entry.data.toString()).to.eq('data'))
 
       expect(Object.keys(result)).to.include.members([
@@ -108,7 +107,6 @@ describe('Swarm provider', () => {
       const result = await bzz.downloadDirectoryData(rootCid)
       expect(Object.keys(result).length).to.eq(1)
 
-      // @ts-ignore
       Object.values(result).forEach(entry => entry.data && expect(entry.data.toString()).to.eq('data'))
 
       expect(Object.keys(result)).to.include.members(['folder/empty/'])
@@ -129,7 +127,6 @@ describe('Swarm provider', () => {
       const result = await bzz.downloadDirectoryData(rootCid)
       expect(Object.keys(result).length).to.eq(3)
 
-      // @ts-ignore
       Object.values(result).forEach(entry => entry.data && expect(entry.data.toString()).to.eq('data'))
       expect(Object.keys(result)).to.include.members([
         'file',
@@ -192,7 +189,6 @@ describe('Swarm provider', () => {
       log(`downloaded directory ${result}`)
       expect(Object.keys(result).length).to.eq(3)
 
-      // @ts-ignore
       Object.values(result).forEach(entry => entry.data && expect(entry.data.toString()).to.eq('data'))
 
       expect(Object.keys(result)).to.include.members([
@@ -224,7 +220,6 @@ describe('Swarm provider', () => {
       log(`downloaded directory ${result}`)
       expect(Object.keys(result).length).to.eq(3)
 
-      // @ts-ignore
       Object.values(result).forEach(entry => entry.data && expect(entry.data.toString()).to.eq('data'))
 
       expect(Object.keys(result)).to.include.members([
@@ -290,7 +285,6 @@ describe('Swarm provider', () => {
       const result = await bzz.downloadDirectoryData(rootCid)
       expect(Object.keys(result).length).to.eq(4)
 
-      // @ts-ignore
       Object.values(result).forEach(entry => entry.data && expect(entry.data.toString()).to.eq('data'))
       expect(Object.keys(result)).to.include.members([
         'file',

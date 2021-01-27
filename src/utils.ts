@@ -11,7 +11,7 @@ export const DIRECTORY_SYMBOL = Symbol.for('@rds-lib/directory')
  * @see isFile
  * @param obj
  */
-export function markFile<T extends object> (obj: T): T {
+export function markFile<T> (obj: T): T {
   if (typeof obj !== 'object' || obj === null) {
     throw TypeError('obj is not object!')
   }
@@ -28,7 +28,7 @@ export function markFile<T extends object> (obj: T): T {
  * @see isDirectory
  * @param obj
  */
-export function markDirectory<T extends object> (obj: T): T {
+export function markDirectory<T extends Record<string, unknown>> (obj: T): T {
   if (typeof obj !== 'object' || obj === null) {
     throw TypeError('obj is not object!')
   }
@@ -43,7 +43,7 @@ export function markDirectory<T extends object> (obj: T): T {
  *
  * @param obj
  */
-export function isFile (obj: object): obj is Entry<any> {
+export function isFile (obj: unknown): obj is Entry<any> {
   if (typeof obj !== 'object' || obj === null) {
     throw TypeError('obj is not object!')
   }
@@ -57,7 +57,7 @@ export function isFile (obj: object): obj is Entry<any> {
  *
  * @param obj
  */
-export function isDirectory (obj: object): obj is Directory<any> {
+export function isDirectory (obj: unknown): obj is Directory<any> {
   if (typeof obj !== 'object' || obj === null) {
     throw TypeError('obj is not object!')
   }
@@ -66,7 +66,7 @@ export function isDirectory (obj: object): obj is Directory<any> {
   return Boolean(obj[DIRECTORY_SYMBOL])
 }
 
-export function isTSDirectory<T> (data: object, genericTest: (entry: T) => boolean): data is Directory<T> {
+export function isTSDirectory<T> (data: unknown, genericTest: (entry: T) => boolean): data is Directory<T> {
   if (typeof data !== 'object' || Array.isArray(data) || data === null) {
     return false
   }
@@ -78,7 +78,7 @@ export function isTSDirectory<T> (data: object, genericTest: (entry: T) => boole
   )
 }
 
-export function isTSDirectoryArray<T> (data: object, genericTest: (entry: T) => boolean): data is DirectoryArray<T> {
+export function isTSDirectoryArray<T> (data: unknown, genericTest: (entry: T) => boolean): data is DirectoryArray<T> {
   if (!Array.isArray(data)) {
     return false
   }

@@ -1,5 +1,8 @@
 import { RootAPI as IPFS } from 'ipfs-core-types'
 import type { ClientOptions } from 'ipfs-http-client/src/lib/core'
+import type { AddAllOptions, GetOptions as RootGetOptions } from 'ipfs-core-types/src/root'
+import type { HttpOptions } from 'ipfs-http-client'
+
 import { Readable } from 'stream'
 import { Manager } from './manager'
 import { BzzConfig, DownloadOptions, UploadOptions } from './swarm-mini'
@@ -118,11 +121,16 @@ export interface StorageProvider<Addr, GetOpts, PutOpts extends PutOptions> {
   put (data: DirectoryArray<Buffer | Readable>, options?: PutOpts): Promise<Addr>
 }
 
+export type IpfsPutOptions = AddAllOptions & HttpOptions & PutOptions
+export type IpfsGetOptions = RootGetOptions & HttpOptions
+
 export interface IpfsStorageProvider
-  extends StorageProvider<CID | string, object, object> {
+  extends StorageProvider<CID | string, IpfsGetOptions, IpfsPutOptions> {
   readonly ipfs: Ipfs
 }
 
-export type SwarmStorageProvider = StorageProvider<Address, DownloadOptions, UploadOptions>
+export type SwarmGetOptions = DownloadOptions
+export type SwarmPutOptions = UploadOptions
+export type SwarmStorageProvider = StorageProvider<Address, SwarmGetOptions, SwarmPutOptions>
 
 export type AllProviders = IpfsStorageProvider | SwarmStorageProvider | Manager

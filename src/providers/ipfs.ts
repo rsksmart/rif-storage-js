@@ -3,12 +3,11 @@ import CID from 'cids'
 import debug from 'debug'
 import { Readable, Transform } from 'stream'
 
-import ipfs, { HttpOptions } from 'ipfs-http-client'
+import ipfs from 'ipfs-http-client'
 import type { ClientOptions } from 'ipfs-http-client/src/lib/core'
 import type { ToFile, ToContent, File as IPFSFile, IPFSEntry } from 'ipfs-core-types/src/files'
-import type { AddAllOptions, GetOptions as RootGetOptions } from 'ipfs-core-types/src/root'
 
-import { Provider } from '../definitions'
+import { IpfsGetOptions, IpfsPutOptions, Provider } from '../definitions'
 import type { Directory, Ipfs, IpfsStorageProvider, PutInputs } from '../definitions'
 import { ValueError } from '../errors'
 import {
@@ -22,9 +21,6 @@ import {
 } from '../utils'
 
 const log = debug('rds:ipfs')
-
-type AddOptions = AddAllOptions & HttpOptions
-type GetOptions = RootGetOptions & HttpOptions
 
 function isIpfs (client: Ipfs | ClientOptions): client is Ipfs {
   client = client as Ipfs
@@ -136,7 +132,7 @@ function mapDataToIpfs (data: Directory<ToContent>): Array<ToFile> {
  * @param options
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function put (this: IpfsStorageProvider, data: PutInputs, options?: AddOptions & { fileName?: string }): Promise<string> {
+async function put (this: IpfsStorageProvider, data: PutInputs, options?: IpfsPutOptions): Promise<string> {
   options = options || {}
 
   if (typeof data === 'string') {
@@ -219,7 +215,7 @@ async function put (this: IpfsStorageProvider, data: PutInputs, options?: AddOpt
  * @param address - CID compatible address
  * @param options
  */
-async function get (this: IpfsStorageProvider, address: CID | string, options?: GetOptions): Promise<Directory<Buffer> | Buffer> {
+async function get (this: IpfsStorageProvider, address: CID | string, options?: IpfsGetOptions): Promise<Directory<Buffer> | Buffer> {
   validateAddress(address)
 
   const result = await arrayFromAsyncIter(this.ipfs.get(address, options))
@@ -250,7 +246,7 @@ async function get (this: IpfsStorageProvider, address: CID | string, options?: 
  * @see Storage#getReadable
  */
 // eslint-disable-next-line require-await
-async function getReadable (this: IpfsStorageProvider, address: CID, options?: GetOptions): Promise<Readable> {
+async function getReadable (this: IpfsStorageProvider, address: CID, options?: IpfsGetOptions): Promise<Readable> {
   validateAddress(address)
 
   const trans = new Transform({

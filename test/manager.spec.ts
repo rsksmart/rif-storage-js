@@ -47,7 +47,7 @@ describe('manager', function () {
     })
     expect(manager.activeProvider && manager.activeProvider.type).to.eq(Provider.IPFS)
 
-    // @ts-ignore
+    // @ts-ignore: Asserting private property
     expect(manager.providers).to.have.all.keys(Provider.SWARM, Provider.IPFS)
     expect(manager.activeProvider && manager.activeProvider.type).to.eq(Provider.IPFS)
   })
@@ -56,7 +56,7 @@ describe('manager', function () {
     const manager = new Manager()
 
     expect(() => {
-      // @ts-ignore
+      // @ts-ignore: Testing unknown provider
       manager.addProvider('unkown_provider', ipfs)
     }).to.throw(Error, 'unknown provider')
   })
