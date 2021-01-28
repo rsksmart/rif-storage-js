@@ -12,7 +12,7 @@ import {
   ListResult,
   UploadOptions
 } from './types'
-import { Directory, DirectoryArray, DirectoryEntry } from '../definitions'
+import { Directory, DirectoryArray } from '../definitions'
 import { ValueError } from '../errors'
 import { isReadable, isReadableOrBuffer, isTSDirectory, isTSDirectoryArray, markDirectory, markFile } from '../utils'
 import prepareData from './utils/data'
