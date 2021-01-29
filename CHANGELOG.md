@@ -1,3 +1,13 @@
+<a name="0.1.1"></a>
+## [0.1.1](https://github.com/rsksmart/rif-storage-js/compare/v0.1.0...v0.1.1) (2021-01-29)
+
+
+### Reverts
+
+* chore(deps-dev): bump ipfs to 0.53.2 ([79512ed](https://github.com/rsksmart/rif-storage-js/commit/79512ed))
+
+
+
 <a name="0.1.0"></a>
 # 0.1.0 (2020-01-24)
 
