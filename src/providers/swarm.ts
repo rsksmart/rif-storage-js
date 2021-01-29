@@ -1,7 +1,7 @@
 import {
   Provider,
   SwarmStorageProvider
-} from '../types'
+} from '../definitions'
 import debug from 'debug'
 import { Bzz, BzzConfig } from '../swarm-mini'
 

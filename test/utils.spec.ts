@@ -23,8 +23,6 @@ describe('utils', () => {
     it('should fail with primitives', function () {
       const data = [1, true, 'string', undefined, null]
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
       data.forEach(entry => expect(() => utils.markFile(entry)).to.throw(TypeError)) // eslint-disable-line max-nested-callbacks
     })
   })
@@ -41,8 +39,7 @@ describe('utils', () => {
     it('should fail with primitives', function () {
       const data = [1, true, 'string', undefined, null]
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
+      // @ts-ignore: Testing primitives
       data.forEach(entry => expect(() => utils.markDirectory(entry)).to.throw(TypeError)) // eslint-disable-line max-nested-callbacks
     })
   })
@@ -59,8 +56,6 @@ describe('utils', () => {
     it('should fail with primitives', function () {
       const data = [1, true, 'string', undefined, null]
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
       data.forEach(entry => expect(() => utils.isFile(entry)).to.throw(TypeError)) // eslint-disable-line max-nested-callbacks
     })
   })
@@ -77,8 +72,7 @@ describe('utils', () => {
     it('should fail with primitives', function () {
       const data = [1, true, 'string', undefined, null]
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
+      // @ts-ignore: testing different types
       data.forEach(entry => expect(() => utils.isDirectory(entry), `Expected to throw with ${entry} value`).to.throw(TypeError)) // eslint-disable-line max-nested-callbacks
     })
   })

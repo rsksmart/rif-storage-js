@@ -1,5 +1,10 @@
 module.exports = {
   depCheck: {
-    ignore: ['@erebos/api-bzz-browser', 'readable-stream', 'sinon', 'typedoc', 'typedoc-plugin-markdown', '@types/*', 'tasegir']
+    ignore: ['readable-stream', 'electron', 'typedoc', 'typedoc-plugin-markdown', '@types/*', 'tasegir', '@erebos/api-bzz-browser']
+  },
+  tsconfig: {
+    compilerOptions: {
+      skipLibCheck: true
+    }
   }
 }

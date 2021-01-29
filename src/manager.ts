@@ -5,8 +5,14 @@ import {
   Entry,
   ProviderOptions,
   Provider,
-  StorageProvider
-} from './types'
+  StorageProvider,
+  SwarmPutOptions,
+  IpfsPutOptions,
+  SwarmGetOptions,
+  IpfsGetOptions,
+  SwarmStorageProvider,
+  IpfsStorageProvider
+} from './definitions'
 import { Readable } from 'stream'
 import factory from './index'
 import { ProviderError, ValueError } from './errors'
@@ -46,7 +52,7 @@ import { detectAddress } from './utils'
  console.log(storage.get(swarmHash).toString()) // Retrieves data from Swarm and prints 'hello swarm!'
  ```
  */
-export class Manager implements StorageProvider<string, object, object> {
+export class Manager implements StorageProvider<string, SwarmGetOptions | IpfsGetOptions, SwarmPutOptions | IpfsPutOptions> {
   private readonly providers: Partial<Record<Provider, AllProviders>>
   private active?: Provider
 
@@ -104,7 +110,7 @@ export class Manager implements StorageProvider<string, object, object> {
   }
 
   // eslint-disable-next-line require-await
-  private async getHelper (fnName: 'get' | 'getReadable', address: string, options?: object): Promise<Directory<Buffer> | Buffer | Readable> {
+  private async getHelper (fnName: 'get' | 'getReadable', address: string, options?: SwarmGetOptions | IpfsGetOptions): Promise<Directory<Buffer> | Buffer | Readable> {
     const detected = detectAddress(address)
 
     if (detected === Provider.IPFS) {
@@ -113,13 +119,13 @@ export class Manager implements StorageProvider<string, object, object> {
       }
 
       // "!" is TS syntax for forcing compiler to not complain about possible null or undefined
-      return this.providers[Provider.IPFS]![fnName](address, options)
+      return (this.providers[Provider.IPFS] as IpfsStorageProvider)![fnName](address, options as IpfsGetOptions)
     } else if (detected === Provider.SWARM) {
       if (this.providers[Provider.SWARM] === undefined) {
         throw new ProviderError('You wanted to fetched Swarm address, but you haven\'t register Swarm provider!')
       }
 
-      return this.providers[Provider.SWARM]![fnName](address, options)
+      return (this.providers[Provider.SWARM] as SwarmStorageProvider)![fnName](address, options as SwarmGetOptions)
     } else {
       throw new ValueError('Address does not have expected format')
     }
@@ -137,7 +143,7 @@ export class Manager implements StorageProvider<string, object, object> {
    * @throws {ValueError} if given address does not have expected format
    * @see Storage#get
    */
-  get (address: string, options?: object): Promise<Directory<Buffer> | Buffer> {
+  get (address: string, options?: SwarmGetOptions | IpfsGetOptions): Promise<Directory<Buffer> | Buffer> {
     return this.getHelper('get', address, options) as Promise<Directory<Buffer> | Buffer>
   }
 
@@ -153,7 +159,7 @@ export class Manager implements StorageProvider<string, object, object> {
    * @throws {ValueError} if given address does not have expected format
    * @see Storage#get
    */
-  getReadable (address: string, options?: object): Promise<Readable> {
+  getReadable (address: string, options?: SwarmGetOptions | IpfsGetOptions): Promise<Readable> {
     return this.getHelper('getReadable', address, options) as Promise<Readable>
   }
 
@@ -165,16 +171,14 @@ export class Manager implements StorageProvider<string, object, object> {
    * @throws {ProviderError} if there is no activeProvider (and hence no provider registered)
    * @see Storage#put
    */
-  put (data: string | Buffer | Readable, options?: object): Promise<string>
-  put (data: Directory<string | Buffer | Readable> | Array<Entry<Buffer | Readable>>, options?: object): Promise<string>
-  put (data: string | Buffer | Readable | Directory<string | Buffer | Readable> | DirectoryArray<Buffer | Readable>, options?: object): Promise<string> {
+  put (data: string | Buffer | Readable, options?: SwarmPutOptions | IpfsPutOptions): Promise<string>
+  put (data: Directory<string | Buffer | Readable> | Array<Entry<Buffer | Readable>>, options?: SwarmPutOptions | IpfsPutOptions): Promise<string>
+  put (data: string | Buffer | Readable | Directory<string | Buffer | Readable> | DirectoryArray<Buffer | Readable>, options?: SwarmPutOptions | IpfsPutOptions): Promise<string> {
     if (!this.activeProvider) {
       throw new ProviderError('Before putting any data, you have to first add some provider!')
     }
 
-    // TypeScript does have problems with overloading, the implementation
-    // signature is actually matching but he looks only to the function definitions.
-    // @ts-ignore
+    // @ts-ignore: TypeScript does have problems with overloading, the implementation signature is actually matching but he looks only to the function definitions.
     return this.activeProvider.put(data, options)
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { DownloadProgress } from 'ky'
 
 export interface ListEntry {
@@ -19,13 +20,13 @@ export interface KyOptions {
   onDownloadProgress?: (progress: DownloadProgress, chunk: Uint8Array) => void
 }
 
+export type BzzMode = 'default' | 'immutable' | 'raw'
+
 export interface FileOptions extends KyOptions {
   contentType?: string
   path?: string
   mode?: BzzMode
 }
-
-export type BzzMode = 'default' | 'immutable' | 'raw'
 
 export type DownloadOptions = FileOptions
 

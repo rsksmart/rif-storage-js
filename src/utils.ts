@@ -1,4 +1,4 @@
-import { Directory, DirectoryArray, Entry, Provider } from './types'
+import { Directory, DirectoryArray, Entry, Provider } from './definitions'
 import { Readable } from 'stream'
 import CID from 'cids'
 
@@ -11,13 +11,12 @@ export const DIRECTORY_SYMBOL = Symbol.for('@rds-lib/directory')
  * @see isFile
  * @param obj
  */
-export function markFile<T extends object> (obj: T): T {
+export function markFile<T> (obj: T): T {
   if (typeof obj !== 'object' || obj === null) {
     throw TypeError('obj is not object!')
   }
 
-  // TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
-  // @ts-ignore
+  // @ts-ignore: TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
   obj[FILE_SYMBOL] = true
   return obj
 }
@@ -29,13 +28,12 @@ export function markFile<T extends object> (obj: T): T {
  * @see isDirectory
  * @param obj
  */
-export function markDirectory<T extends object> (obj: T): T {
+export function markDirectory<T extends Record<string, unknown>> (obj: T): T {
   if (typeof obj !== 'object' || obj === null) {
     throw TypeError('obj is not object!')
   }
 
-  // TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
-  // @ts-ignore
+  // @ts-ignore: TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
   obj[DIRECTORY_SYMBOL] = true
   return obj
 }
@@ -45,13 +43,12 @@ export function markDirectory<T extends object> (obj: T): T {
  *
  * @param obj
  */
-export function isFile (obj: object): obj is Entry<any> {
+export function isFile (obj: unknown): obj is Entry<any> {
   if (typeof obj !== 'object' || obj === null) {
     throw TypeError('obj is not object!')
   }
 
-  // TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
-  // @ts-ignore
+  // @ts-ignore: TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
   return Boolean(obj[FILE_SYMBOL])
 }
 
@@ -60,17 +57,16 @@ export function isFile (obj: object): obj is Entry<any> {
  *
  * @param obj
  */
-export function isDirectory (obj: object): obj is Directory<any> {
+export function isDirectory (obj: unknown): obj is Directory<any> {
   if (typeof obj !== 'object' || obj === null) {
     throw TypeError('obj is not object!')
   }
 
-  // TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
-  // @ts-ignore
+  // @ts-ignore: TS does not support indexing with Symbols - https://github.com/microsoft/TypeScript/issues/1863
   return Boolean(obj[DIRECTORY_SYMBOL])
 }
 
-export function isTSDirectory<T> (data: object, genericTest: (entry: T) => boolean): data is Directory<T> {
+export function isTSDirectory<T> (data: unknown, genericTest: (entry: T) => boolean): data is Directory<T> {
   if (typeof data !== 'object' || Array.isArray(data) || data === null) {
     return false
   }
@@ -82,7 +78,7 @@ export function isTSDirectory<T> (data: object, genericTest: (entry: T) => boole
   )
 }
 
-export function isTSDirectoryArray<T> (data: object, genericTest: (entry: T) => boolean): data is DirectoryArray<T> {
+export function isTSDirectoryArray<T> (data: unknown, genericTest: (entry: T) => boolean): data is DirectoryArray<T> {
   if (!Array.isArray(data)) {
     return false
   }
@@ -119,4 +115,28 @@ export function detectAddress (address: string): Provider | false {
 
     return Provider.SWARM
   }
+}
+
+/**
+ * Fetches last item of the async iterable.
+ * @param iter
+ */
+export async function lastAsyncIterItem<T> (iter: AsyncIterable<T>): Promise<T | undefined> {
+  let last: T | undefined
+
+  for await (const el of iter) {
+    last = el
+  }
+
+  return last
+}
+
+export async function arrayFromAsyncIter<T> (iter: AsyncIterable<T>): Promise<T[]> {
+  const arr: T[] = []
+
+  for await (const el of iter) {
+    arr.push(el)
+  }
+
+  return arr
 }

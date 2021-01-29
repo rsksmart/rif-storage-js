@@ -21,6 +21,7 @@
   "browser": {
     "./lib/swarm-mini/utils/data.js": "./lib/swarm-mini/utils/data.browser.js",
     "./src/swarm-mini/utils/data.ts": "./src/swarm-mini/utils/data.browser.ts",
+    "./test/providers/ipfs/create-repo-nodejs.js": "./test/providers/ipfs/create-repo-browser.js",
     "stream": "readable-stream",
     "@erebos/api-bzz-node": "@erebos/api-bzz-browser"
   },
@@ -42,15 +43,15 @@
     "test:browser": "tasegir test --target browser --target webworker"
   },
   "dependencies": {
-    "cids": "^0.8.0",
-    "debug": "^4.1.0",
+    "async-iterator-to-stream": "^1.2.0",
+    "cids": "^1.1.5",
+    "debug": "^4.3.1",
     "form-data": "^3.0.0",
-    "ipfs-http-client": "^44.0.3",
-    "ky": "^0.16.2",
-    "ky-universal": "^0.3.0",
-    "multiaddr": "^7.2.1",
-    "readable-stream": "^3.5.0",
-    "tar-stream": "^2.1.0"
+    "ipfs-http-client": "^48.2.0",
+    "ky": "^0.24.0",
+    "ky-universal": "^0.8.2",
+    "readable-stream": "^3.6.0",
+    "tar-stream": "^2.2.0"
   },
   "devDependencies": {
     "@erebos/api-bzz-browser": "^0.12.0",
@@ -64,15 +65,18 @@
     "@types/node-fetch": "^2.5.4",
     "@types/pull-stream": "^3.6.0",
     "@types/readable-stream": "^2.3.5",
+    "@types/rimraf": "^3.0.0",
     "@types/tar-stream": "^2.1.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dirty-chai": "^2.0.1",
-    "ipfs": "^0.40.0",
-    "ipfsd-ctl": "^0.47.4",
-    "merge-options": "^2.0.0",
-    "sinon": "^8.1.1",
-    "tasegir": "^1.6.0",
+    "electron": "^11.2.1",
+    "ipfs": "^0.52.3",
+    "ipfs-core-types": "^0.2.0",
+    "ipfs-repo": "^7.0.0",
+    "nanoid": "^3.1.20",
+    "rimraf": "^3.0.2",
+    "tasegir": "^1.9.3",
     "typedoc": "^0.17.4",
     "typedoc-plugin-markdown": "^2.2.16"
   },

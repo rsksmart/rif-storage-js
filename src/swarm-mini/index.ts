@@ -12,7 +12,7 @@ import {
   ListResult,
   UploadOptions
 } from './types'
-import { Directory, DirectoryArray } from '../types'
+import { Directory, DirectoryArray } from '../definitions'
 import { ValueError } from '../errors'
 import { isReadable, isReadableOrBuffer, isTSDirectory, isTSDirectoryArray, markDirectory, markFile } from '../utils'
 import prepareData from './utils/data'
@@ -71,8 +71,11 @@ function mapDirectoryArrayToDirectory<T> (data: DirectoryArray<T>): Directory<T>
     }
 
     const path: string = currentValue.path
-    delete currentValue.path
-    previousValue[path] = currentValue
+    previousValue[path] = {
+      contentType: currentValue.contentType,
+      data: currentValue.data,
+      size: currentValue.size
+    }
     return previousValue
   }, {})
 }
@@ -325,9 +328,7 @@ export class Bzz {
     const url = getUploadURL(options)
 
     try {
-      // AuHau: In NodeJS ky = node_fetch which supports Buffer and Readable, but ky uses browser's definitions, so
-      // ignoring it for compatibilities. Suggestions how to improve this will be welcomed.
-      // @ts-ignore
+      // @ts-ignore: In NodeJS ky = node_fetch which supports Buffer and Readable, but ky uses browser's definitions, so ignoring it for compatibilities. Suggestions how to improve this will be welcomed.
       return (await this.ky.post(url, { body: await prepareData(data), headers: options.headers })).text()
     } catch (e) {
       if (e.response) {
@@ -423,7 +424,7 @@ export class Bzz {
     }
 
     if ((Array.isArray(data) && data.length === 0) || Object.keys(data).length === 0) {
-      // TODO: [Q] Empty object should throw error? If not then what to return? https://github.com/rsksmart/rds-libjs/issues/4
+      // TODO: [Q] Empty object should throw error? If not then what to return? https://github.com/rsksmart/rif-storage-js/issues/4
       throw new ValueError('You passed empty Directory')
     }
 

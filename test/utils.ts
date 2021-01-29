@@ -1,4 +1,6 @@
 import { Readable } from 'stream'
+import { File as IPFSFile, IPFSEntry } from 'ipfs-core-types/src/files'
+import { arrayFromAsyncIter } from '../src/utils'
 
 export function createReadable (input: string): Readable {
   const stream = new Readable()
@@ -23,8 +25,22 @@ export function streamToBuffer (stream: Readable): Promise<Buffer> {
   })
 }
 
+export function getFileEntry (entry: IPFSEntry): IPFSFile {
+  if (entry.type === 'dir') {
+    throw new Error('Entry is not file!')
+  }
+
+  return entry as unknown as IPFSFile
+}
+
 export async function streamToString (stream: Readable): Promise<string> {
   return (await streamToBuffer(stream)).toString('utf8')
+}
+
+export async function asyncIteratorToString (iter?: AsyncIterable<Uint8Array>): Promise<string> {
+  if (!iter) throw new TypeError('Iter can not be undefined!')
+
+  return Buffer.concat(await arrayFromAsyncIter(iter)).toString()
 }
 
 /**

@@ -1,6 +1,6 @@
-import { ipfs as ipfsProvider, swarm as swarmProvider } from '../../src'
+import { Ipfs, ipfs as ipfsProvider, StorageProvider, swarm as swarmProvider } from '../../src'
 import createIpfs from './ipfs/utils'
-import { Directory, IpfsStorageProvider, SwarmStorageProvider } from '../../src/types'
+import { Directory, IpfsStorageProvider, SwarmStorageProvider } from '../../src/definitions'
 import { ValueError } from '../../src/errors'
 
 import chai from 'chai'
@@ -16,10 +16,8 @@ const expect = chai.expect
 
 const PROVIDERS = {
   async ipfs (): Promise<[IpfsStorageProvider, () => void]> {
-    const factory = createIpfs()
-    const ipfs = await factory.setup()
-    const teardown = factory.teardown
-    return [ipfsProvider(ipfs), teardown]
+    const factory = await createIpfs()
+    return [ipfsProvider(factory.ipfs as unknown as Ipfs), factory.teardown]
   },
   swarm (): Promise<[SwarmStorageProvider, () => void]> {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -30,7 +28,7 @@ const PROVIDERS = {
 describe('Common providers tests', () => {
   Object.entries(PROVIDERS).forEach(([providerName, setup]) => {
     describe(`${providerName} provider`, function () {
-      let provider: IpfsStorageProvider | SwarmStorageProvider, teardown: () => void
+      let provider: StorageProvider<any, any, any>, teardown: () => void
       this.timeout(10 * 1000)
 
       before(async () => {
@@ -56,7 +54,7 @@ describe('Common providers tests', () => {
             [{ 'some-path': { data: {} } }, ValueError],
             [{ 'some-path': { data: null } }, ValueError]
           ]
-          // @ts-ignore
+          // @ts-ignore: testing failures
           const promises = inputs.map(([entry, err]) => expect(provider.put(entry), `failing with ${JSON.stringify(entry)}`).to.be.eventually.rejectedWith(err))
           return Promise.all(promises)
         })
@@ -75,7 +73,6 @@ describe('Common providers tests', () => {
         it('get() should validate input', function () {
           const inputs = [1, null, undefined, {}, []]
 
-          // @ts-ignore
           const promises = inputs.map(entry => expect(provider.get(entry)).to.be.eventually.rejectedWith(ValueError))
           return Promise.all(promises)
         })
@@ -83,7 +80,6 @@ describe('Common providers tests', () => {
         it('getReadable() should validate input', function () {
           const inputs = [1, null, undefined, {}, []]
 
-          // @ts-ignore
           const promises = inputs.map(entry => expect(provider.getReadable(entry)).to.be.eventually.rejectedWith(ValueError))
           return Promise.all(promises)
         })

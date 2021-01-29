@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import { Directory } from '../../types'
+import { Directory } from '../../definitions'
 import { Readable } from 'readable-stream'
 import { isReadable } from '../../utils'
 
