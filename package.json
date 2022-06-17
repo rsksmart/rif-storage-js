@@ -70,7 +70,7 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dirty-chai": "^2.0.1",
-    "electron": "^11.2.1",
+    "electron": "^15.5.5",
     "ipfs": "^0.52.3",
     "ipfs-core-types": "^0.2.0",
     "ipfs-repo": "^7.0.0",
